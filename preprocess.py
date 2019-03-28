@@ -19,7 +19,6 @@ from nltk.corpus import stopwords
 from nltk import ngrams
 
 def read_excel(file):
-    file = "review_data_test.xlsx"
     dataset = pd.read_excel(file, sheet_name = "Sheet_1")
     return dataset
 
@@ -81,7 +80,7 @@ for i in range(1, 10):
     if inside == True:
         # The restaurant is in the 2nd data frame.
         df2.number[smthg] +=1
-        df2.total_n_grams[smthg] += df.total_n_grams[i]
+        df2.total_n_grams[smthg] += df.n_grams[i]
     if inside == False:
         # The restaurant is NOT the 2nd data frame.
         df2 = df2.append({'restaurant_id': df.restaurant_id[i], 'name': df.name[i], 'number': 1, 'total_n_grams': df.n_grams[i]}, ignore_index=True)
