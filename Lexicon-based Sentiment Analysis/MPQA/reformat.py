@@ -9,10 +9,6 @@
     Wan Chee Tin
     Yeo Lin Chung
     
-@update:
-
-    1. (24/03/2019) Implementation completed.
-    
 """
 
 import re

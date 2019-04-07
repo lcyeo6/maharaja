@@ -9,9 +9,6 @@
     Wan Chee Tin
     Yeo Lin Chung
     
-@update:
-
-    
 """
 
 import pandas as pd
@@ -23,12 +20,13 @@ from nltk.corpus import stopwords
 def read_excel(filename):
     
     dataset = pd.read_excel(filename, sheet_name = "Sheet1")
+    
     return dataset
 
 def pre_process(dataset):
     
     # Remove unwanted columns
-    dataset = dataset.drop(["uniq_id", "url", "restaurant_location", "category", "review_date", "author", "author_url", "location", "visited_on"], axis = 1)
+    dataset = dataset.drop(["uniq_id", "url", "restaurant_id", "restaurant_location", "category", "review_date", "author", "author_url", "location", "visited_on"], axis = 1)
     
     # Remove rows if NaN exists in specific column, in this case "review_text" & "rating" columns
     dataset = dataset.dropna(subset = ["review_text", "rating"])
@@ -108,6 +106,7 @@ for index, row in MPQA_Lexicon.iterrows():
     MPQA[row[0]] = int(row[1])
     
 def lexicon_analysis(data):
+    
     sentence_score = 0
     for i in data:
         if i in MPQA:
@@ -135,7 +134,8 @@ for row in filtered_dataset["total_sentiment_score"]:
         total_positive += 1
     else:
         total_neutral += 1
-        
+    
+print()    
 print("Percentage of Negative Sentiment: %.1f%%" % ((total_negative/total_data) * 100))
 print("Percentage of Positive Sentiment: %.1f%%" % ((total_positive/total_data) * 100))
 print("Percentage of Neutral Sentiment: %.1f%%" % ((total_neutral/total_data) * 100))    
