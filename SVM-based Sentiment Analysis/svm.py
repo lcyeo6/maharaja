@@ -14,6 +14,8 @@
 import pandas as pd
 import re
 from collections import Counter
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
 
 def read_excel(filename):
     
@@ -73,6 +75,8 @@ dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 # Data cleaning & pre-processing
 filtered_dataset = pre_process(dataset)
 
+"--------------------------------------------------------------------------------------------------------------------"
+
 # Storing both normalized review texts and star ratings in repective arrays
 review_text = []
 star_rating = []
@@ -82,3 +86,12 @@ for index, row in filtered_dataset.iterrows():
     
 equalized_review_text, equalized_star_rating = class_equity(review_text, star_rating)
     
+# Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
+tfidf_vectorizer = TfidfVectorizer(ngram_range = (1, 2))
+
+# Construct vocabulary and inverse document frequency from all the review texts
+# Then, transform each review text into a tf-idf weighted document term matrix
+vectorized_data = tfidf_vectorizer.fit_transform(equalized_review_text)
+
+train_X, test_X, train_Y, test_Y = train_test_split(vectorized_data, equalized_star_rating)
+

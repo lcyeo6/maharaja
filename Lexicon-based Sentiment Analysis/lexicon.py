@@ -14,6 +14,7 @@
 import pandas as pd
 import re
 import nltk
+import matplotlib.pyplot as plt
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 
@@ -113,37 +114,54 @@ def lexicon_analysis(data):
             sentence_score = sentence_score + MPQA[i]
     
     if (sentence_score < 0):
-        return sentence_score, "negative"
+        return "negative"
     elif (sentence_score > 0):
-        return sentence_score, "positive"
+        return "positive"
     else:
-        return sentence_score, "neutral"
+        return "neutral"
     
-filtered_dataset["total_sentiment_score"] = filtered_dataset.normalized_review_text.apply(lexicon_analysis)
+filtered_dataset["sentiment"] = filtered_dataset.normalized_review_text.apply(lexicon_analysis)
     
 # Summary statistics
 total_data = len(filtered_dataset)
-total_negative = 0
-total_positive = 0
-total_neutral = 0
+total_estimated_negative = 0
+total_estimated_positive = 0
+total_estimated_neutral = 0
 
-for row in filtered_dataset["total_sentiment_score"]:
-    if row[1] == "negative":
-        total_negative += 1
-    elif row[1] == "positive":
-        total_positive += 1
+for row in filtered_dataset["sentiment"]:
+    if row == "negative":
+        total_estimated_negative += 1
+    elif row == "positive":
+        total_estimated_positive += 1
     else:
-        total_neutral += 1
+        total_estimated_neutral += 1
+    
+percentage_negative = (total_estimated_negative/total_data) * 100
+percentage_positive = (total_estimated_positive/total_data) * 100
+percentage_neutral = (total_estimated_neutral/total_data) * 100
     
 print()    
-print("Percentage of Negative Sentiment: %.1f%%" % ((total_negative/total_data) * 100))
-print("Percentage of Positive Sentiment: %.1f%%" % ((total_positive/total_data) * 100))
-print("Percentage of Neutral Sentiment: %.1f%%" % ((total_neutral/total_data) * 100))    
+print("Percentage of Estimated Negative Sentiment: %.1f%%" % percentage_negative)
+print("Percentage of Estimated Positive Sentiment: %.1f%%" % percentage_positive)
+print("Percentage of Estimated Neutral Sentiment: %.1f%%" % percentage_neutral)    
+print()   
+
+"--------------------------------------------------------------------------------------------------------------------"
+ 
+# Bar Chart for Sentiment Percentage
+
+x = [1, 2, 3]
+y = [percentage_negative, percentage_positive, percentage_neutral]
+
+x_label = ["Negative", "Positive", "Neutral"]    
+
+plt.bar(x, y, tick_label = x_label, width = 0.6, color = ["red", "green", "blue"])  
+
+plt.xlabel("Sentiment")
+plt.ylabel("Percentage")
+
+plt.title("Bar Chart")
+
+plt.show()
     
-    
-    
-    
-    
-    
-    
-    
+"--------------------------------------------------------------------------------------------------------------------"
