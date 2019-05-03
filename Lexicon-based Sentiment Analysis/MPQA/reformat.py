@@ -31,15 +31,17 @@ for line in content:
     lexicon_score = 0
     
     if lexicon.group(3) == "positive":
-        if lexicon.group(1) == "weaksubj":
-            lexicon_score = 1
-        else:
-            lexicon_score = 2
+        lexicon_score = 1
+#        if lexicon.group(1) == "weaksubj":
+#            lexicon_score = 1
+#        else:
+#            lexicon_score = 2
     elif lexicon.group(3) == "negative":
-        if lexicon.group(1) == "weaksubj":
-            lexicon_score = -1
-        else:
-            lexicon_score = -2
+        lexicon_score = -1
+#        if lexicon.group(1) == "weaksubj":
+#            lexicon_score = -1
+#        else:
+#            lexicon_score = -2
             
     outfile.write("%s, %d\n" % (lexicon.group(2), lexicon_score))
     
