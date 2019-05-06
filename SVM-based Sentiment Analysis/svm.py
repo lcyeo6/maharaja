@@ -164,8 +164,8 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     
     y_pred = clf.predict(X_test)
     
-#    print ("Classification Report:")
-#    print (metrics.classification_report(y_test, y_pred))
+    print ("Classification Report:")
+    print (metrics.classification_report(y_test, y_pred))
     print ("Confusion Matrix:")
     print (metrics.confusion_matrix(y_test, y_pred))
     
@@ -182,10 +182,14 @@ accuracy_test = []
 precision = []
 recall = []
 f1 = []
+
+n=0
 # Split dataset into training and testing
 
 kfold = KFold(10, True, 1)
 for train_index, test_index in kfold.split(vectorized_data, equalized_star_rating):
+    n +=1
+    print(n)
     t3 = datetime.datetime.now()
     X_train, X_test = vectorized_data[train_index], vectorized_data[test_index]
     y_train = [equalized_star_rating[i] for i in train_index]
@@ -194,7 +198,6 @@ for train_index, test_index in kfold.split(vectorized_data, equalized_star_ratin
     print("Train and test time")
     print(datetime.datetime.now() - t3)
 
-print("DONE 10 times")
 print("accuracy_train: {}".format(np.mean(accuracy_train)))
 print("accuracy_test: {}".format(np.mean(accuracy_test)))
 print("precision: {}".format(np.mean(precision)))

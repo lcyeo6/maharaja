@@ -228,8 +228,8 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     
     y_pred = clf.predict(X_test)
     
-#    print ("Classification Report:")
-#    print (metrics.classification_report(y_test, y_pred))
+    print ("Classification Report:")
+    print (metrics.classification_report(y_test, y_pred))
     print ("Confusion Matrix:")
     print (metrics.confusion_matrix(y_test, y_pred))
     
