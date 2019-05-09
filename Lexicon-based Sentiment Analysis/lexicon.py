@@ -17,6 +17,7 @@ import nltk
 import matplotlib.pyplot as plt
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
+import sklearn
 
 def read_excel(filename):
     
@@ -106,7 +107,18 @@ MPQA = {}
 for index, row in MPQA_Lexicon.iterrows():
     MPQA[row[0]] = int(row[1])
     
-def lexicon_analysis(data):
+def actual_sentiment(data):
+
+    for i in data:
+        sentiment = int(i[0])
+        if sentiment == 4 or sentiment == 5:
+            return "positive"
+        elif sentiment == 1 or sentiment == 2:
+            return "negative"
+        else:
+            return "neutral"    
+
+def predict_sentiment(data):
     
     sentence_score = 0
     for i in data:
@@ -119,49 +131,91 @@ def lexicon_analysis(data):
         return "positive"
     else:
         return "neutral"
+        
+filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)    
     
-filtered_dataset["sentiment"] = filtered_dataset.normalized_review_text.apply(lexicon_analysis)
-    
-# Summary statistics
-total_data = len(filtered_dataset)
-total_estimated_negative = 0
-total_estimated_positive = 0
-total_estimated_neutral = 0
+filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment)
+        
+actual = []
+predicted = []
+count_neutral = 0
+count_positive = 0
+count_negative = 0
 
-for row in filtered_dataset["sentiment"]:
-    if row == "negative":
-        total_estimated_negative += 1
-    elif row == "positive":
-        total_estimated_positive += 1
-    else:
-        total_estimated_neutral += 1
+miss_neutral = 0
+miss_positive = 0
+miss_negative = 0
+
+for index, row in filtered_dataset.iterrows():
+    actual.append(row[9])
+    predicted.append(row[10])
+    if row[9] == "neutral" and row[10] == "neutral":
+        count_neutral += 1
+    elif row[9] == "positive" and row[10] == "positive":
+        count_positive += 1
+    elif row[9] == "negative" and row[10] == "negative":
+        count_negative += 1
+        
+    elif row[9] == "neutral" and row[10] != "neutral":
+        miss_neutral += 1
+    elif row[9] == "positive" and row[10] != "positive":
+        miss_positive += 1
+    elif row[9] == "negative" and row[10] != "negative":
+        miss_negative += 1    
+        
+
+(miss_positive/len(filtered_dataset))* 100 
+(miss_negative/len(filtered_dataset))* 100    
+(miss_neutral/len(filtered_dataset))* 100   
     
-percentage_negative = (total_estimated_negative/total_data) * 100
-percentage_positive = (total_estimated_positive/total_data) * 100
-percentage_neutral = (total_estimated_neutral/total_data) * 100
+sklearn.metrics.accuracy_score(actual, predicted)
+
     
-print()    
-print("Percentage of Estimated Negative Sentiment: %.1f%%" % percentage_negative)
-print("Percentage of Estimated Positive Sentiment: %.1f%%" % percentage_positive)
-print("Percentage of Estimated Neutral Sentiment: %.1f%%" % percentage_neutral)    
-print()   
+"--------------------------------------------------------------------------------------------------------------------"
+
+# Summary statistics
+
+#total_data = len(filtered_dataset)
+#total_estimated_negative = 0
+#total_estimated_positive = 0
+#total_estimated_neutral = 0
+#
+#for row in filtered_dataset["actual_sentiment"]:
+#    if row == "negative":
+#        total_estimated_negative += 1
+#    elif row == "positive":
+#        total_estimated_positive += 1
+#    else:
+#        total_estimated_neutral += 1
+#    
+#percentage_negative = (total_estimated_negative/total_data) * 100
+#percentage_positive = (total_estimated_positive/total_data) * 100
+#percentage_neutral = (total_estimated_neutral/total_data) * 100
+#    
+#print()    
+#print("Percentage of Estimated Negative Sentiment: %.1f%%" % percentage_negative)
+#print("Percentage of Estimated Positive Sentiment: %.1f%%" % percentage_positive)
+#print("Percentage of Estimated Neutral Sentiment: %.1f%%" % percentage_neutral)    
+#print()   
 
 "--------------------------------------------------------------------------------------------------------------------"
  
 # Bar Chart for Sentiment Percentage
 
-x = [1, 2, 3]
-y = [percentage_negative, percentage_positive, percentage_neutral]
-
-x_label = ["Negative", "Positive", "Neutral"]    
-
-plt.bar(x, y, tick_label = x_label, width = 0.6, color = ["red", "green", "blue"])  
-
-plt.xlabel("Sentiment")
-plt.ylabel("Percentage")
-
-plt.title("Bar Chart")
-
-plt.show()
+#x = [1, 2, 3]
+#y = [percentage_negative, percentage_positive, percentage_neutral]
+#
+#x_label = ["Negative", "Positive", "Neutral"]    
+#
+#plt.bar(x, y, tick_label = x_label, width = 0.6, color = ["red", "green", "blue"])  
+#
+#plt.xlabel("Sentiment")
+#plt.ylabel("Percentage")
+#
+#plt.title("Bar Chart")
+#
+#plt.show()
     
 "--------------------------------------------------------------------------------------------------------------------"
+
+
