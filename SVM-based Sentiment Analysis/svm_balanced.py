@@ -91,15 +91,79 @@ def class_equity(a, b):
 
     equalized_a = []
     equalized_b = []
-    
-#    print(statistics.median(word_count))
+    no_of_words = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
+    counter_1 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
+    counter_2 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
+    counter_3 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
+    counter_4 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
+    counter_5 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
+    for i, e in enumerate(b):
+        if e == 1:
+            if len(a[i]) <= 50:
+                no_of_words["50"] +=1
+            elif len(a[i]) >50 and len(a[i]) <=100:
+                no_of_words["100"] +=1
+            elif len(a[i]) >100 and len(a[i]) <=150:
+                no_of_words["150"] +=1
+            elif len(a[i]) >150 and len(a[i]) <=200:
+                no_of_words["200"] +=1
+            elif len(a[i]) >200 and len(a[i]) <=250:
+                no_of_words["250"] +=1
+            else:
+                no_of_words["300"] +=1         
         
     # Balance the dataset by removing over-represented samples from two arrays
+    def equalizer(counter):
+        if total[element] < maximum:
+            if len(a[index]) <= 50:
+                if counter["50"] < no_of_words["50"]:
+                    counter["50"] +=1
+                    equalized_a.append(a[index])
+                    equalized_b.append(element)
+                    total[element] += 1
+            elif len(a[index]) > 50 and len(a[index]) <= 100:
+                if counter["100"] < no_of_words["100"]:
+                    counter["100"] +=1
+                    equalized_a.append(a[index])
+                    equalized_b.append(element)
+                    total[element] += 1
+            elif len(a[index]) > 100 and len(a[index]) <= 150:
+                if counter["150"] < no_of_words["150"]:
+                    counter["150"] +=1
+                    equalized_a.append(a[index])
+                    equalized_b.append(element)
+                    total[element] += 1
+            elif len(a[index]) > 150 and len(a[index]) <= 200:
+                if counter["200"] < no_of_words["200"]:
+                    counter["200"] +=1
+                    equalized_a.append(a[index])
+                    equalized_b.append(element)
+                    total[element] += 1
+            elif len(a[index]) > 200 and len(a[index]) <= 250:
+                if counter["250"] < no_of_words["250"]:
+                    counter["250"] +=1
+                    equalized_a.append(a[index])
+                    equalized_b.append(element)
+                    total[element] += 1
+            else:
+                if counter["300"] < no_of_words["300"]:
+                    counter["300"] +=1
+                    equalized_a.append(a[index])
+                    equalized_b.append(element)
+                    total[element] += 1
+                    
     for index, element in enumerate(b):
-#        if total[element] < maximum:
-        equalized_a.append(a[index])
-        equalized_b.append(element)
-        total[element] += 1
+        if element == 1:
+            equalizer(counter_1)
+        elif element == 2:
+            equalizer(counter_2)
+        elif element == 3:
+            equalizer(counter_3)
+        elif element == 4:
+            equalizer(counter_4)
+        else:
+            equalizer(counter_5)
+
     return equalized_a, equalized_b
 
 def identify_token(text):
@@ -183,12 +247,11 @@ precision = []
 recall = []
 f1 = []
 
-n=0
 # Split dataset into training and testing
-
+n=0
 kfold = KFold(10, True, 1)
 for train_index, test_index in kfold.split(vectorized_data, equalized_star_rating):
-    n +=1
+    n+=1
     print(n)
     t3 = datetime.datetime.now()
     X_train, X_test = vectorized_data[train_index], vectorized_data[test_index]
@@ -197,7 +260,8 @@ for train_index, test_index in kfold.split(vectorized_data, equalized_star_ratin
     train_and_evaluate(svc_1, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision, recall, f1)
     print("Train and test time")
     print(datetime.datetime.now() - t3)
-
+    
+    
 print("accuracy_train: {}".format(np.mean(accuracy_train)))
 print("accuracy_test: {}".format(np.mean(accuracy_test)))
 print("precision: {}".format(np.mean(precision)))
