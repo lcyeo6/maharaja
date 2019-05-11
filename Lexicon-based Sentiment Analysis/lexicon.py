@@ -17,7 +17,7 @@ import nltk
 import matplotlib.pyplot as plt
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
-import sklearn
+from sklearn.metrics import accuracy_score
 
 def read_excel(filename):
     
@@ -119,47 +119,6 @@ def predict_sentiment(data):
 filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)    
     
 filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment)
-        
-actual = []
-predicted = []
-count_neutral = 0
-count_positive = 0
-count_negative = 0
-
-miss_neutral = 0
-miss_positive = 0
-miss_negative = 0
-
-for index, row in filtered_dataset.iterrows():
-    actual.append(row[8])
-    predicted.append(row[9])
-    if row[8] == 3 and row[9] == 3:
-        count_neutral += 1
-    elif row[8] == 4 and row[9] == 4:
-        count_positive += 1
-    elif row[8] == 5 and row[9] == 5:
-        count_positive += 1
-    elif row[8] == 1 and row[9] == 1:
-        count_negative += 1
-    elif row[8] == 2 and row[9] == 2:
-        count_negative += 1    
-        
-    elif row[8] == 3 and row[9] != 3:
-        miss_neutral += 1
-    elif row[8] == 4 and row[9] != 4:
-        miss_positive += 1
-    elif row[8] == 5 and row[9] != 5:
-        miss_positive += 1
-    elif row[8] == 1 and row[9] != 1:
-        miss_negative += 1    
-    elif row[8] == 2 and row[9] != 2:
-        miss_negative += 1 
-        
-#(miss_positive/len(filtered_dataset))* 100 
-#(miss_negative/len(filtered_dataset))* 100    
-#(miss_neutral/len(filtered_dataset))* 100   
-    
-#sklearn.metrics.accuracy_score(actual, predicted)
 
 filtered_dataset.to_excel("MPQA_Dataset.xlsx", index = False)
 
@@ -167,28 +126,47 @@ filtered_dataset.to_excel("MPQA_Dataset.xlsx", index = False)
 
 # Summary statistics
 
-#total_data = len(filtered_dataset)
-#total_estimated_negative = 0
-#total_estimated_positive = 0
-#total_estimated_neutral = 0
-#
-#for row in filtered_dataset["actual_sentiment"]:
-#    if row == "negative":
-#        total_estimated_negative += 1
-#    elif row == "positive":
-#        total_estimated_positive += 1
-#    else:
-#        total_estimated_neutral += 1
-#    
-#percentage_negative = (total_estimated_negative/total_data) * 100
-#percentage_positive = (total_estimated_positive/total_data) * 100
-#percentage_neutral = (total_estimated_neutral/total_data) * 100
-#    
-#print()    
-#print("Percentage of Estimated Negative Sentiment: %.1f%%" % percentage_negative)
-#print("Percentage of Estimated Positive Sentiment: %.1f%%" % percentage_positive)
-#print("Percentage of Estimated Neutral Sentiment: %.1f%%" % percentage_neutral)    
-#print()   
+total_data = len(filtered_dataset)
+one_star = 0
+two_star = 0
+three_star = 0
+four_star = 0
+five_star = 0
+
+actual = []
+predicted = []
+
+for index, row in filtered_dataset.iterrows():
+    actual.append(row[8])
+    predicted.append(row[9])
+    
+    if row[8] == 1 and row[9] == 1:
+        one_star += 1
+    if row[8] == 2 and row[9] == 2:
+        two_star += 1
+    if row[8] == 3 and row[9] == 3:
+        three_star += 1
+    if row[8] == 4 and row[9] == 4:
+        four_star += 1
+    if row[8] == 5 and row[9] == 5:
+        five_star += 1
+    
+accuracy = accuracy_score(actual, predicted) * 100
+    
+percentage_one_star = (one_star/total_data) * 100
+percentage_two_star = (two_star/total_data) * 100
+percentage_three_star = (three_star/total_data) * 100
+percentage_four_star = (four_star/total_data) * 100
+percentage_five_star = (five_star/total_data) * 100
+    
+print()    
+print("Percentage of Accuracy: %.1f%%" % accuracy)
+print("Percentage of Correctly Estimated 1 Star: %.1f%%" % percentage_one_star)
+print("Percentage of Correctly Estimated 2 Star: %.1f%%" % percentage_two_star)
+print("Percentage of Correctly Estimated 3 Star: %.1f%%" % percentage_three_star)    
+print("Percentage of Correctly Estimated 4 Star: %.1f%%" % percentage_four_star) 
+print("Percentage of Correctly Estimated 5 Star: %.1f%%" % percentage_five_star) 
+print()   
 
 "--------------------------------------------------------------------------------------------------------------------"
  
