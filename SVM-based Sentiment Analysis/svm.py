@@ -14,8 +14,8 @@ import pandas as pd
 import numpy as np
 import re
 import datetime
-from collections import Counter
 import nltk
+from collections import Counter
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -76,6 +76,7 @@ def pre_process(dataset):
     return dataset
 
 def class_equity(a, b):
+    
     # Count the frequency of each category
     occurrence = Counter(b)
     
@@ -100,6 +101,7 @@ def class_equity(a, b):
         equalized_a.append(a[index])
         equalized_b.append(element)
         total[element] += 1
+        
     return equalized_a, equalized_b
 
 def identify_token(text):
@@ -111,7 +113,9 @@ def identify_token(text):
 
 # Read the data from Excel file
 dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
+
 t1 = datetime.datetime.now()
+
 # Data cleaning & pre-processing
 filtered_dataset = pre_process(dataset)
 
@@ -125,7 +129,8 @@ for index, row in filtered_dataset.iterrows():
     star_rating.append(int(row[3][0]))
     
 equalized_review_text, equalized_star_rating = class_equity(review_text, star_rating)
-print("PRE-process time")
+
+print("Pre-process Time")
 print(datetime.datetime.now() - t1)
 
 
@@ -137,7 +142,7 @@ t2 = datetime.datetime.now()
 # Then, transform each review text into a tf-idf weighted document term matrix
 vectorized_data = tfidf_vectorizer.fit_transform(equalized_review_text)
 #print(vectorized_data)
-print("Vectorizing time")
+print("Vectorizing Time")
 print(datetime.datetime.now() - t2)
 
 "-----------------------------------------------------------------"
@@ -182,7 +187,7 @@ precision = []
 recall = []
 f1 = []
 
-n=0
+n = 0
 # Split dataset into training and testing
 
 kfold = KFold(10, True, 1)

@@ -84,18 +84,25 @@ MPQA_Lexicon = pd.read_csv("MPQA/MPQA_Lexicon.csv", header = None, names = ["Sub
 # Construct a Python dictionary to hold the lexicon
 MPQA = {}
 
+# Store each lexicon in a dictionary, e.g. {"Word": ("Subjectivity", "Polarity Score")}
 for index, row in MPQA_Lexicon.iterrows():
     MPQA[row[1]] = (row[0], int(row[2]))
     
 def actual_sentiment(data):
     
+    # Convert string-format star rating into integer-format
     for i in data:
         return int(i[0])  
 
 def predict_sentiment(data):
     
+    # Counter for weak subjectivity word
     weak_frequency = 0
+    
+    # Counter for strong subjectivity word
     strong_frequency = 0
+    
+    # Compute the sentence's sentiment score by total up the word's polarity score
     sentence_score = 0
     for i in data:
         if i in MPQA:
@@ -105,19 +112,29 @@ def predict_sentiment(data):
             elif MPQA[i][0] == 'strongsubj':
                  strong_frequency += 1
     
+    # Strong negative
     if (sentence_score < 0) and (weak_frequency < strong_frequency):
         return 1
+    
+    # Weak negative
     elif (sentence_score < 0) and (weak_frequency >= strong_frequency):
         return 2
+    
+    # Strong positive
     elif (sentence_score > 0) and (weak_frequency < strong_frequency):
         return 5
+    
+    # Weak positive
     elif (sentence_score > 0) and (weak_frequency >= strong_frequency):
         return 4
+    
+    # Neutral
     else:
         return 3
         
 filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)    
     
+# Predict sentiment score for each of the normalized review texts
 filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment)
 
 filtered_dataset.to_excel("MPQA_Dataset.xlsx", index = False)
