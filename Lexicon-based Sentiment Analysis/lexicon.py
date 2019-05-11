@@ -70,67 +70,51 @@ def pre_process(dataset):
 
     return dataset
 
-def ngrams(data):
-    
-    # Generate sequences of normalized words beginning from distinct elements of the list of normalized words
-    # The zip function takes the sequences as a list of inputs
-    # bigram = A sequence of two adjacent words
-    bigram = []
-    for i in list(zip(data, data[1:])):
-        bigram.append(' '.join(i))
-    
-    # Generate sequences of normalized words beginning from distinct elements of the list of normalized words
-    # The zip function takes the sequences as a list of inputs
-    # trigram = A sequence of three adjacent words
-    trigram = []
-    for j in list(zip(data, data[1:], data[2:])):
-        trigram.append(' '.join(j))
-    
-    return bigram + trigram
-
 # Read the data from Excel file
 dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 
 # Data cleaning & pre-processing
 filtered_dataset = pre_process(dataset)
-filtered_dataset["ngrams"] = filtered_dataset.normalized_review_text.apply(ngrams)
 
 "--------------------------------------------------------------------------------------------------------------------"
 
 # Read the MPQA lexicon file from CSV file
-MPQA_Lexicon = pd.read_csv("MPQA/MPQA_Lexicon.csv", header = None)
-MPQA_Lexicon.columns = ["Word", "Polarity Score"]
+MPQA_Lexicon = pd.read_csv("MPQA/MPQA_Lexicon.csv", header = None, names = ["Subjectivity", "Word", "Polarity Score"])
 
 # Construct a Python dictionary to hold the lexicon
 MPQA = {}
 
 for index, row in MPQA_Lexicon.iterrows():
-    MPQA[row[0]] = int(row[1])
+    MPQA[row[1]] = (row[0], int(row[2]))
     
 def actual_sentiment(data):
-
+    
     for i in data:
-        sentiment = int(i[0])
-        if sentiment == 4 or sentiment == 5:
-            return "positive"
-        elif sentiment == 1 or sentiment == 2:
-            return "negative"
-        else:
-            return "neutral"    
+        return int(i[0])  
 
 def predict_sentiment(data):
     
+    weak_frequency = 0
+    strong_frequency = 0
     sentence_score = 0
     for i in data:
         if i in MPQA:
-            sentence_score = sentence_score + MPQA[i]
+            sentence_score = sentence_score + MPQA[i][1]
+            if MPQA[i][0] == 'weaksubj':
+                 weak_frequency += 1
+            elif MPQA[i][0] == 'strongsubj':
+                 strong_frequency += 1
     
-    if (sentence_score < 0):
-        return "negative"
-    elif (sentence_score > 0):
-        return "positive"
+    if (sentence_score < 0) and (weak_frequency < strong_frequency):
+        return 1
+    elif (sentence_score < 0) and (weak_frequency >= strong_frequency):
+        return 2
+    elif (sentence_score > 0) and (weak_frequency < strong_frequency):
+        return 5
+    elif (sentence_score > 0) and (weak_frequency >= strong_frequency):
+        return 4
     else:
-        return "neutral"
+        return 3
         
 filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)    
     
@@ -147,30 +131,38 @@ miss_positive = 0
 miss_negative = 0
 
 for index, row in filtered_dataset.iterrows():
-    actual.append(row[9])
-    predicted.append(row[10])
-    if row[9] == "neutral" and row[10] == "neutral":
+    actual.append(row[8])
+    predicted.append(row[9])
+    if row[8] == 3 and row[9] == 3:
         count_neutral += 1
-    elif row[9] == "positive" and row[10] == "positive":
+    elif row[8] == 4 and row[9] == 4:
         count_positive += 1
-    elif row[9] == "negative" and row[10] == "negative":
+    elif row[8] == 5 and row[9] == 5:
+        count_positive += 1
+    elif row[8] == 1 and row[9] == 1:
         count_negative += 1
+    elif row[8] == 2 and row[9] == 2:
+        count_negative += 1    
         
-    elif row[9] == "neutral" and row[10] != "neutral":
+    elif row[8] == 3 and row[9] != 3:
         miss_neutral += 1
-    elif row[9] == "positive" and row[10] != "positive":
+    elif row[8] == 4 and row[9] != 4:
         miss_positive += 1
-    elif row[9] == "negative" and row[10] != "negative":
+    elif row[8] == 5 and row[9] != 5:
+        miss_positive += 1
+    elif row[8] == 1 and row[9] != 1:
         miss_negative += 1    
+    elif row[8] == 2 and row[9] != 2:
+        miss_negative += 1 
         
-
-(miss_positive/len(filtered_dataset))* 100 
-(miss_negative/len(filtered_dataset))* 100    
-(miss_neutral/len(filtered_dataset))* 100   
+#(miss_positive/len(filtered_dataset))* 100 
+#(miss_negative/len(filtered_dataset))* 100    
+#(miss_neutral/len(filtered_dataset))* 100   
     
-sklearn.metrics.accuracy_score(actual, predicted)
+#sklearn.metrics.accuracy_score(actual, predicted)
 
-    
+filtered_dataset.to_excel("MPQA_Dataset.xlsx", index = False)
+
 "--------------------------------------------------------------------------------------------------------------------"
 
 # Summary statistics

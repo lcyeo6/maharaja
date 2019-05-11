@@ -107,7 +107,6 @@ def identify_token(text):
     return text
 
 
-
 "-----------------------------------------------------------------"
 
 # Read the data from Excel file
@@ -188,7 +187,7 @@ n=0
 
 kfold = KFold(10, True, 1)
 for train_index, test_index in kfold.split(vectorized_data, equalized_star_rating):
-    n +=1
+    n += 1
     print(n)
     t3 = datetime.datetime.now()
     X_train, X_test = vectorized_data[train_index], vectorized_data[test_index]
@@ -206,28 +205,27 @@ print("f1: {}".format(np.mean(f1)))
 
 
 
-# Evaluate K-fold cross-validation with 10-folds
+## Evaluate K-fold cross-validation with 10-folds
 #evaluate_cross_validation(svc_1, X_train, y_train, 10)
-
-
-# Perform training on training data and evaluate performance on testing data
+#
+#
+## Perform training on training data and evaluate performance on testing data
 #train_and_evaluate(svc_1, X_train, X_test, y_train, y_test)
 #print("Train and test time")
 #print(datetime.datetime.now() - t3)
-
-
+#
+#
 ## K-fold cross validation
 #from sklearn.model_selection import KFold
 #kfold = KFold(10, True, 1)
 #for train, test in kfold.split(vectorized_data):
 #    print('train: %s, test: %s' % (vectorized_data[train], vectorized_data[test]))
-
+#
 #from sklearn.cross_validation import cross_val_score, cross_val_predict
 #from sklearn import metrics
 ## Perform 6-fold cross validation
 #scores = cross_val_score(model, df, y, cv=6)
 #print('Cross-validated scores:', scores)
-
 
 
 

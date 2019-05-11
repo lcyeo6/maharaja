@@ -32,17 +32,9 @@ for line in content:
     
     if lexicon.group(3) == "positive":
         lexicon_score = 1
-#        if lexicon.group(1) == "weaksubj":
-#            lexicon_score = 1
-#        else:
-#            lexicon_score = 2
     elif lexicon.group(3) == "negative":
         lexicon_score = -1
-#        if lexicon.group(1) == "weaksubj":
-#            lexicon_score = -1
-#        else:
-#            lexicon_score = -2
             
-    outfile.write("%s, %d\n" % (lexicon.group(2), lexicon_score))
+    outfile.write("%s,%s,%d\n" % (lexicon.group(1), lexicon.group(2), lexicon_score))
     
 outfile.close()
