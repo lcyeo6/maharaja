@@ -91,12 +91,18 @@ def class_equity(a, b):
 
     equalized_a = []
     equalized_b = []
+	
+	# Number of words in the least number of reviews 
     no_of_words = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
+	
+	# Counter to keep track of the number of words of the current data
     counter_1 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
     counter_2 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
     counter_3 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
     counter_4 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
     counter_5 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
+	
+	# To check the no of words in 1-star rating data
     for i, e in enumerate(b):
         if e == 1:
             if len(a[i]) <= 50:
@@ -112,8 +118,8 @@ def class_equity(a, b):
             else:
                 no_of_words["300"] +=1         
         
-    # Balance the dataset by removing over-represented samples from two arrays
     def equalizer(counter):
+	# Balance the dataset by removing over-represented samples from two arrays
         if total[element] < maximum:
             if len(a[index]) <= 50:
                 if counter["50"] < no_of_words["50"]:
@@ -152,6 +158,7 @@ def class_equity(a, b):
                     equalized_b.append(element)
                     total[element] += 1
                     
+	# Balance data for each star rating
     for index, element in enumerate(b):
         if element == 1:
             equalizer(counter_1)
@@ -170,8 +177,6 @@ def identify_token(text):
 #   Return it's text back, as requested as a token
     return text
 
-
-
 "-----------------------------------------------------------------"
 
 # Read the data from Excel file
@@ -180,7 +185,7 @@ t1 = datetime.datetime.now()
 # Data cleaning & pre-processing
 filtered_dataset = pre_process(dataset)
 
-"--------------------------------------------------------------------------------------------------------------------"
+"-----------------------------------------------------------------"
 
 # Storing both normalized review texts and star ratings in repective arrays
 review_text = []
@@ -188,11 +193,12 @@ star_rating = []
 for index, row in filtered_dataset.iterrows():
     review_text.append(row[7])
     star_rating.append(int(row[3][0]))
-    
+
+# Balance the data we are going to put into training and testing
 equalized_review_text, equalized_star_rating = class_equity(review_text, star_rating)
+
 print("PRE-process time")
 print(datetime.datetime.now() - t1)
-
 
 # Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
 tfidf_vectorizer = TfidfVectorizer(tokenizer=identify_token, ngram_range = (1, 1), lowercase=False)
@@ -201,22 +207,14 @@ t2 = datetime.datetime.now()
 # Construct vocabulary and inverse document frequency from all the review texts
 # Then, transform each review text into a tf-idf weighted document term matrix
 vectorized_data = tfidf_vectorizer.fit_transform(equalized_review_text)
-#print(vectorized_data)
+
 print("Vectorizing time")
 print(datetime.datetime.now() - t2)
 
 "-----------------------------------------------------------------"
 
-#def evaluate_cross_validation(clf, X, y, K):
-#    # create a k-fold croos validation iterator
-#    cv = KFold(10, True, 1)
-#    # by default the score used is the one returned by score method of the estimator (accuracy)
-#    scores = cross_val_score(clf, X, y, cv=cv)
-#    print (scores)
-#    print (("Mean score: {0:.3f} (+/-{1:.3f})").format(np.mean(scores), sem(scores)))
-
 def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
-    # Function to perform training on the training set and evaluate the performance on the testing set
+    # Perform training on the training set
     clf.fit(X_train, y_train)
     
 #    print ("Accuracy on training set:")
@@ -226,6 +224,7 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
 #    print (clf.score(X_test, y_test))
     accuracy_test.append(clf.score(X_test, y_test))
     
+	# Predicting the training data used on the test data
     y_pred = clf.predict(X_test)
     
     print ("Classification Report:")
@@ -233,6 +232,7 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     print ("Confusion Matrix:")
     print (metrics.confusion_matrix(y_test, y_pred))
     
+	# Appending all the score into it's own list for averaging the score at the end.
     precision_micro.append(precision_score(y_test,y_pred,average='micro',labels=np.unique(y_pred)))
     recall_micro.append(recall_score(y_test,y_pred,average='micro'))
     f1_micro.append(f1_score(y_test,y_pred,average='micro',labels=np.unique(y_pred)))
@@ -254,6 +254,7 @@ svc_1 = SVC(kernel='linear')
 # RBF
 #svc_1 = SVC(kernel='rbf')
 
+# List to store 10-fold of the scores
 accuracy_train = []
 accuracy_test = []
 precision_micro = []
@@ -265,8 +266,11 @@ f1_macro = []
 precision_weight = []
 recall_weight = []
 f1_weight = []
-# Split dataset into training and testing
+
+# To count which fold the program is currently at
 n=0
+
+# Split dataset into training and testing, using 10-fold classification
 kfold = KFold(10, True, 1)
 for train_index, test_index in kfold.split(vectorized_data, equalized_star_rating):
     n+=1
@@ -275,11 +279,14 @@ for train_index, test_index in kfold.split(vectorized_data, equalized_star_ratin
     X_train, X_test = vectorized_data[train_index], vectorized_data[test_index]
     y_train = [equalized_star_rating[i] for i in train_index]
     y_test = [equalized_star_rating[i] for i in test_index]
+	
+	# Train and test the data
     train_and_evaluate(svc_1, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)
-    print("Train and test time")
+    
+	print("Train and test time")
     print(datetime.datetime.now() - t3)
     
-    
+# Print out the average scores
 print("accuracy_train: {}".format(np.mean(accuracy_train)))
 print("accuracy_test: {}".format(np.mean(accuracy_test)))
 print("precision micro: {}".format(np.mean(precision_micro)))
@@ -291,30 +298,3 @@ print("f1 macro: {}".format(np.mean(f1_macro)))
 print("precision weight: {}".format(np.mean(precision_weight)))
 print("recall weight: {}".format(np.mean(recall_weight)))
 print("f1 weight: {}".format(np.mean(f1_weight)))
-
-# Evaluate K-fold cross-validation with 10-folds
-#evaluate_cross_validation(svc_1, X_train, y_train, 10)
-
-
-# Perform training on training data and evaluate performance on testing data
-#train_and_evaluate(svc_1, X_train, X_test, y_train, y_test)
-#print("Train and test time")
-#print(datetime.datetime.now() - t3)
-
-
-## K-fold cross validation
-#from sklearn.model_selection import KFold
-#kfold = KFold(10, True, 1)
-#for train, test in kfold.split(vectorized_data):
-#    print('train: %s, test: %s' % (vectorized_data[train], vectorized_data[test]))
-
-#from sklearn.cross_validation import cross_val_score, cross_val_predict
-#from sklearn import metrics
-## Perform 6-fold cross validation
-#scores = cross_val_score(model, df, y, cv=6)
-#print('Cross-validated scores:', scores)
-
-
-
-
-##train_X, test_X, train_Y, test_Y = train_test_split(vectorized_data, equalized_star_rating)

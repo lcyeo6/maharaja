@@ -75,38 +75,9 @@ def pre_process(dataset):
 
     return dataset
 
-def class_equity(a, b):
-    # Count the frequency of each category
-    occurrence = Counter(b)
-    
-    # The least common category will be the minimum equity
-    maximum = occurrence.most_common()[-1][1]
-    print(occurrence)
-    print(maximum)
-
-    # Serve as counter
-    total = dict()
-    for category in occurrence.keys():
-        total[category] = 0
-
-    equalized_a = []
-    equalized_b = []
-    
-#    print(statistics.median(word_count))
-        
-    # Balance the dataset by removing over-represented samples from two arrays
-    for index, element in enumerate(b):
-#        if total[element] < maximum:
-        equalized_a.append(a[index])
-        equalized_b.append(element)
-        total[element] += 1
-    return equalized_a, equalized_b
-
 def identify_token(text):
 #   Return it's text back, as requested as a token
     return text
-
-
 
 "-----------------------------------------------------------------"
 
@@ -118,14 +89,13 @@ filtered_dataset = pre_process(dataset)
 
 "--------------------------------------------------------------------------------------------------------------------"
 
-# Storing both normalized review texts and star ratings in repective arrays
+# Storing both review texts and star ratings in repective arrays
 review_text = []
 star_rating = []
 for index, row in filtered_dataset.iterrows():
     review_text.append(row[7])
     star_rating.append(int(row[3][0]))
     
-equalized_review_text, equalized_star_rating = class_equity(review_text, star_rating)
 print("PRE-process time")
 print(datetime.datetime.now() - t1)
 
@@ -136,23 +106,15 @@ t2 = datetime.datetime.now()
 
 # Construct vocabulary and inverse document frequency from all the review texts
 # Then, transform each review text into a tf-idf weighted document term matrix
-vectorized_data = tfidf_vectorizer.fit_transform(equalized_review_text)
-#print(vectorized_data)
+vectorized_data = tfidf_vectorizer.fit_transform(review_text)
+
 print("Vectorizing time")
 print(datetime.datetime.now() - t2)
 
 "-----------------------------------------------------------------"
 
-#def evaluate_cross_validation(clf, X, y, K):
-#    # create a k-fold croos validation iterator
-#    cv = KFold(10, True, 1)
-#    # by default the score used is the one returned by score method of the estimator (accuracy)
-#    scores = cross_val_score(clf, X, y, cv=cv)
-#    print (scores)
-#    print (("Mean score: {0:.3f} (+/-{1:.3f})").format(np.mean(scores), sem(scores)))
-
 def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
-    # Function to perform training on the training set and evaluate the performance on the testing set
+    # Perform training on the training set
     clf.fit(X_train, y_train)
     
 #    print ("Accuracy on training set:")
@@ -162,6 +124,7 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
 #    print (clf.score(X_test, y_test))
     accuracy_test.append(clf.score(X_test, y_test))
     
+	# Predicting the training data used on the test data
     y_pred = clf.predict(X_test)
     
     print ("Classification Report:")
@@ -169,6 +132,7 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     print ("Confusion Matrix:")
     print (metrics.confusion_matrix(y_test, y_pred))
     
+	# Appending all the score into it's own list for averaging the score at the end.
     precision_micro.append(precision_score(y_test,y_pred,average='micro',labels=np.unique(y_pred)))
     recall_micro.append(recall_score(y_test,y_pred,average='micro'))
     f1_micro.append(f1_score(y_test,y_pred,average='micro',labels=np.unique(y_pred)))
@@ -180,6 +144,8 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     precision_weight.append(precision_score(y_test,y_pred,average='weighted',labels=np.unique(y_pred)))
     recall_weight.append(recall_score(y_test,y_pred,average='weighted'))
     f1_weight.append(f1_score(y_test,y_pred,average='weighted',labels=np.unique(y_pred)))
+	
+	return accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight
     
 
 # LinearSVC
@@ -188,6 +154,7 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
 # Normal SVC
 svc_1 = SVC(kernel='linear')
 
+# List to store 10-fold of the scores
 accuracy_train = []
 accuracy_test = []
 precision_micro = []
@@ -199,22 +166,28 @@ f1_macro = []
 precision_weight = []
 recall_weight = []
 f1_weight = []
-     
-n=0
-# Split dataset into training and testing
 
+# To count which fold the program is currently at
+n=0
+
+# Split dataset into training and testing, using 10-fold classification
 kfold = KFold(10, True, 1)
-for train_index, test_index in kfold.split(vectorized_data, equalized_star_rating):
+for train_index, test_index in kfold.split(vectorized_data, star_rating):
+	# Split the data to train and test for each fold
     n +=1
     print(n)
     t3 = datetime.datetime.now()
     X_train, X_test = vectorized_data[train_index], vectorized_data[test_index]
-    y_train = [equalized_star_rating[i] for i in train_index]
-    y_test = [equalized_star_rating[i] for i in test_index]
-    train_and_evaluate(svc_1, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)
-    print("Train and test time")
+    y_train = [star_rating[i] for i in train_index]
+    y_test = [star_rating[i] for i in test_index]
+	
+	# Train and test the data
+    accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight = train_and_evaluate(svc_1, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)
+    
+	print("Train and test time")
     print(datetime.datetime.now() - t3)
 
+# Print out the average scores 
 print("accuracy_train: {}".format(np.mean(accuracy_train)))
 print("accuracy_test: {}".format(np.mean(accuracy_test)))
 print("precision micro: {}".format(np.mean(precision_micro)))
@@ -227,31 +200,3 @@ print("precision weight: {}".format(np.mean(precision_weight)))
 print("recall weight: {}".format(np.mean(recall_weight)))
 print("f1 weight: {}".format(np.mean(f1_weight)))
 
-
-
-# Evaluate K-fold cross-validation with 10-folds
-#evaluate_cross_validation(svc_1, X_train, y_train, 10)
-
-
-# Perform training on training data and evaluate performance on testing data
-#train_and_evaluate(svc_1, X_train, X_test, y_train, y_test)
-#print("Train and test time")
-#print(datetime.datetime.now() - t3)
-
-
-## K-fold cross validation
-#from sklearn.model_selection import KFold
-#kfold = KFold(10, True, 1)
-#for train, test in kfold.split(vectorized_data):
-#    print('train: %s, test: %s' % (vectorized_data[train], vectorized_data[test]))
-
-#from sklearn.cross_validation import cross_val_score, cross_val_predict
-#from sklearn import metrics
-## Perform 6-fold cross validation
-#scores = cross_val_score(model, df, y, cv=6)
-#print('Cross-validated scores:', scores)
-
-
-
-
-##train_X, test_X, train_Y, test_Y = train_test_split(vectorized_data, equalized_star_rating)
