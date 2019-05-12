@@ -215,7 +215,7 @@ print(datetime.datetime.now() - t2)
 #    print (scores)
 #    print (("Mean score: {0:.3f} (+/-{1:.3f})").format(np.mean(scores), sem(scores)))
 
-def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision, recall, f1):
+def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
     # Function to perform training on the training set and evaluate the performance on the testing set
     clf.fit(X_train, y_train)
     
@@ -233,20 +233,38 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     print ("Confusion Matrix:")
     print (metrics.confusion_matrix(y_test, y_pred))
     
-    precision.append(precision_score(y_test,y_pred,average='micro',labels=np.unique(y_pred)))
-    recall.append(recall_score(y_test,y_pred,average='micro'))
-    f1.append(f1_score(y_test,y_pred,average='micro',labels=np.unique(y_pred)))
+    precision_micro.append(precision_score(y_test,y_pred,average='micro',labels=np.unique(y_pred)))
+    recall_micro.append(recall_score(y_test,y_pred,average='micro'))
+    f1_micro.append(f1_score(y_test,y_pred,average='micro',labels=np.unique(y_pred)))
     
+    precision_macro.append(precision_score(y_test,y_pred,average='macro',labels=np.unique(y_pred)))
+    recall_macro.append(recall_score(y_test,y_pred,average='macro'))
+    f1_micro.append(f1_score(y_test,y_pred,average='macro',labels=np.unique(y_pred)))
+    
+    precision_weight.append(precision_score(y_test,y_pred,average='weighted',labels=np.unique(y_pred)))
+    recall_weight.append(recall_score(y_test,y_pred,average='weighted'))
+    f1_weight.append(f1_score(y_test,y_pred,average='weighted',labels=np.unique(y_pred)))
+    
+# LinearSVC
+#svc_1 = LinearSVC()
 
+# Normal SVC
 svc_1 = SVC(kernel='linear')
-#print (svc_1)
+    
+# RBF
+#svc_1 = SVC(kernel='rbf')
 
 accuracy_train = []
 accuracy_test = []
-precision = []
-recall = []
-f1 = []
-
+precision_micro = []
+recall_micro = []
+f1_micro = []
+precision_macro = []
+recall_macro = []
+f1_macro = []
+precision_weight = []
+recall_weight = []
+f1_weight = []
 # Split dataset into training and testing
 n=0
 kfold = KFold(10, True, 1)
@@ -257,18 +275,22 @@ for train_index, test_index in kfold.split(vectorized_data, equalized_star_ratin
     X_train, X_test = vectorized_data[train_index], vectorized_data[test_index]
     y_train = [equalized_star_rating[i] for i in train_index]
     y_test = [equalized_star_rating[i] for i in test_index]
-    train_and_evaluate(svc_1, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision, recall, f1)
+    train_and_evaluate(svc_1, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)
     print("Train and test time")
     print(datetime.datetime.now() - t3)
     
     
 print("accuracy_train: {}".format(np.mean(accuracy_train)))
 print("accuracy_test: {}".format(np.mean(accuracy_test)))
-print("precision: {}".format(np.mean(precision)))
-print("recall: {}".format(np.mean(recall)))
-print("f1: {}".format(np.mean(f1)))
-
-
+print("precision micro: {}".format(np.mean(precision_micro)))
+print("recall micro: {}".format(np.mean(recall_micro)))
+print("f1 micro: {}".format(np.mean(f1_micro)))
+print("precision macro: {}".format(np.mean(precision_macro)))
+print("recall macro: {}".format(np.mean(recall_macro)))
+print("f1 macro: {}".format(np.mean(f1_macro)))
+print("precision weight: {}".format(np.mean(precision_weight)))
+print("recall weight: {}".format(np.mean(recall_weight)))
+print("f1 weight: {}".format(np.mean(f1_weight)))
 
 # Evaluate K-fold cross-validation with 10-folds
 #evaluate_cross_validation(svc_1, X_train, y_train, 10)

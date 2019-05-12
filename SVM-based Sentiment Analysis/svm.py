@@ -23,7 +23,6 @@ from sklearn.svm import SVC
 from sklearn import metrics
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 from sklearn.model_selection import KFold
-from imblearn.over_sampling import ADASYN
 
 def read_excel(filename):
     
@@ -76,6 +75,32 @@ def pre_process(dataset):
 
     return dataset
 
+def class_equity(a, b):
+    # Count the frequency of each category
+    occurrence = Counter(b)
+    
+    # The least common category will be the minimum equity
+    maximum = occurrence.most_common()[-1][1]
+    print(occurrence)
+    print(maximum)
+
+    # Serve as counter
+    total = dict()
+    for category in occurrence.keys():
+        total[category] = 0
+
+    equalized_a = []
+    equalized_b = []
+    
+#    print(statistics.median(word_count))
+        
+    # Balance the dataset by removing over-represented samples from two arrays
+    for index, element in enumerate(b):
+#        if total[element] < maximum:
+        equalized_a.append(a[index])
+        equalized_b.append(element)
+        total[element] += 1
+    return equalized_a, equalized_b
 
 def identify_token(text):
 #   Return it's text back, as requested as a token
@@ -100,17 +125,18 @@ for index, row in filtered_dataset.iterrows():
     review_text.append(row[7])
     star_rating.append(int(row[3][0]))
     
+equalized_review_text, equalized_star_rating = class_equity(review_text, star_rating)
 print("PRE-process time")
 print(datetime.datetime.now() - t1)
 
- 
+
 # Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
-tfidf_vectorizer = TfidfVectorizer(tokenizer=identify_token, ngram_range = (1, 1), lowercase=False)
+tfidf_vectorizer = TfidfVectorizer(tokenizer=identify_token, ngram_range = (1, 2), lowercase=False)
 t2 = datetime.datetime.now()
 
 # Construct vocabulary and inverse document frequency from all the review texts
 # Then, transform each review text into a tf-idf weighted document term matrix
-vectorized_data = tfidf_vectorizer.fit_transform(review_text)
+vectorized_data = tfidf_vectorizer.fit_transform(equalized_review_text)
 #print(vectorized_data)
 print("Vectorizing time")
 print(datetime.datetime.now() - t2)
@@ -126,14 +152,12 @@ print(datetime.datetime.now() - t2)
 #    print (("Mean score: {0:.3f} (+/-{1:.3f})").format(np.mean(scores), sem(scores)))
 
 def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
-    sm = ADASYN()
-    overfit_X, overfit_y = sm.fit_sample(X_train, y_train)
     # Function to perform training on the training set and evaluate the performance on the testing set
-    clf.fit(overfit_X, overfit_y)
+    clf.fit(X_train, y_train)
     
 #    print ("Accuracy on training set:")
 #    print (clf.score(X_train, y_train))
-    accuracy_train.append(clf.score(overfit_X, overfit_y))
+    accuracy_train.append(clf.score(X_train, y_train))
 #    print ("Accuracy on testing set:")
 #    print (clf.score(X_test, y_test))
     accuracy_test.append(clf.score(X_test, y_test))
@@ -164,7 +188,6 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
 # Normal SVC
 svc_1 = SVC(kernel='linear')
 
-
 accuracy_train = []
 accuracy_test = []
 precision_micro = []
@@ -176,23 +199,22 @@ f1_macro = []
 precision_weight = []
 recall_weight = []
 f1_weight = []
-
+     
 n=0
 # Split dataset into training and testing
 
 kfold = KFold(10, True, 1)
-for train_index, test_index in kfold.split(vectorized_data, star_rating):
+for train_index, test_index in kfold.split(vectorized_data, equalized_star_rating):
     n +=1
     print(n)
     t3 = datetime.datetime.now()
     X_train, X_test = vectorized_data[train_index], vectorized_data[test_index]
-    y_train = [star_rating[i] for i in train_index]
-    y_test = [star_rating[i] for i in test_index]
+    y_train = [equalized_star_rating[i] for i in train_index]
+    y_test = [equalized_star_rating[i] for i in test_index]
     train_and_evaluate(svc_1, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)
     print("Train and test time")
     print(datetime.datetime.now() - t3)
-    
-    
+
 print("accuracy_train: {}".format(np.mean(accuracy_train)))
 print("accuracy_test: {}".format(np.mean(accuracy_test)))
 print("precision micro: {}".format(np.mean(precision_micro)))
@@ -229,3 +251,7 @@ print("f1 weight: {}".format(np.mean(f1_weight)))
 #scores = cross_val_score(model, df, y, cv=6)
 #print('Cross-validated scores:', scores)
 
+
+
+
+##train_X, test_X, train_Y, test_Y = train_test_split(vectorized_data, equalized_star_rating)
