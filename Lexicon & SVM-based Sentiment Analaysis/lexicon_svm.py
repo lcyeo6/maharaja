@@ -26,4 +26,14 @@ def read_excel(filename):
 # Read the data from Excel file
 dataset = read_excel("MPQA_Dataset.xlsx")
 
-temp = pd.DataFrame(columns = ["name", "title"])
+select_data = pd.Series([])
+
+for index, row in dataset.iterrows():
+    if (row[8] == 3) or (row[8] == row[9]):
+        select_data[index] = 1
+    elif row[8] != row[9]:
+        select_data[index] = 0
+
+dataset.insert(10, "one_or_zero", select_data)
+
+dataset = dataset[dataset.one_or_zero != 0]
