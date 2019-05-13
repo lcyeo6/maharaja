@@ -31,7 +31,7 @@ def select_data(data):
     select_data = pd.Series([])
     
     for index, row in data.iterrows():
-        if (row[8] == 3) or (row[8] == row[9]):
+        if (row[8] == 1) or (row[8] == 2) or (row[8] == 3) or (row[8] == row[9]):
             select_data[index] = 1
         elif row[8] != row[9]:
             select_data[index] = 0
@@ -86,6 +86,25 @@ dataset = read_excel("MPQA_Dataset.xlsx")
 
 # Filter data
 filtered_data = select_data(dataset)
+
+count_1 = 0
+count_2 = 0
+count_3 = 0
+count_4 = 0
+count_5 = 0
+
+for index, row in filtered_data.iterrows():
+    if row[8] == 1:
+        count_1 += 1
+    elif row[8] == 2:
+        count_2 += 1
+    elif row[8] == 3:
+        count_3 += 1
+    elif row[8] == 4:
+        count_4 += 1
+    elif row[8] == 5:
+        count_5 += 1
+        
 
 "-----------------------------------------------------------------"
 

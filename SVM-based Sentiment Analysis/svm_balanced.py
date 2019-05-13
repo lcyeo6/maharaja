@@ -283,7 +283,7 @@ for train_index, test_index in kfold.split(vectorized_data, equalized_star_ratin
 	# Train and test the data
     train_and_evaluate(svc_1, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)
     
-	print("Train and test time")
+    print("Train and test time")
     print(datetime.datetime.now() - t3)
     
 # Print out the average scores
