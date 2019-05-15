@@ -101,7 +101,7 @@ filtered_dataset = pre_process(dataset)
 
 filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)  
 
-filtered_dataset = filtered_dataset[filtered_dataset.actual_sentiment != "neutral"]  
+filtered_dataset = filtered_dataset[filtered_dataset.actual_sentiment != "neutral"]
 
 print("Pre-process Time")
 print(datetime.datetime.now() - t1)
