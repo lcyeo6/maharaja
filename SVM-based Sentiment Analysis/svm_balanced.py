@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 @description:
     
@@ -76,12 +75,14 @@ def pre_process(dataset):
     return dataset
 
 def class_equity(a, b):
+    
     # Count the frequency of each category
     occurrence = Counter(b)
     
     # The least common category will be the minimum equity
-    maximum = occurrence.most_common()[-1][1]
-
+    maximum_star_rating = occurrence.most_common()[-1][0]
+    maximum_amount = occurrence.most_common()[-1][1]
+    
     # Serve as counter
     total = dict()
     for category in occurrence.keys():
@@ -91,18 +92,11 @@ def class_equity(a, b):
     equalized_b = []
 	
 	# Number of words in the least number of reviews 
-    no_of_words = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
+    no_of_words = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
 	
-	# Counter to keep track of the number of words of the current data
-    counter_1 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
-    counter_2 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
-    counter_3 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
-    counter_4 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
-    counter_5 = {"50":0, "100":0, "150":0, "200":0, "250":0, "300":0}
-	
-	# To check the no of words in 1-star rating data
-    for i, e in enumerate(b):
-        if e == 1:
+	# To check the number of words of the review text with the least amount of star rating
+    for i, star_rating in enumerate(b):
+        if star_rating == maximum_star_rating:
             if len(a[i]) <= 50:
                 no_of_words["50"] += 1
             elif len(a[i]) > 50 and len(a[i]) <= 100:
@@ -114,64 +108,84 @@ def class_equity(a, b):
             elif len(a[i]) > 200 and len(a[i]) <= 250:
                 no_of_words["250"] += 1
             else:
-                no_of_words["300"] += 1         
-        
+                no_of_words["300"] += 1  
+                
+    # Counter to keep track of the number of words of the review text with respective star rating
+    counter_1 = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
+    counter_2 = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
+    counter_3 = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
+    counter_4 = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
+    counter_5 = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
+    
     def equalizer(counter):
-	# Balance the dataset by removing over-represented samples from two arrays
-        if total[element] < maximum:
+        
+        # Balance the dataset by removing over-represented samples from two arrays
+        if total[star_rating] < maximum_amount:
             if len(a[index]) <= 50:
                 if counter["50"] < no_of_words["50"]:
                     counter["50"] += 1
                     equalized_a.append(a[index])
-                    equalized_b.append(element)
-                    total[element] += 1
+                    equalized_b.append(star_rating)
+                    total[star_rating] += 1
+                    
             elif len(a[index]) > 50 and len(a[index]) <= 100:
                 if counter["100"] < no_of_words["100"]:
                     counter["100"] += 1
                     equalized_a.append(a[index])
-                    equalized_b.append(element)
-                    total[element] += 1
+                    equalized_b.append(star_rating)
+                    total[star_rating] += 1
+                    
             elif len(a[index]) > 100 and len(a[index]) <= 150:
                 if counter["150"] < no_of_words["150"]:
                     counter["150"] += 1
                     equalized_a.append(a[index])
-                    equalized_b.append(element)
-                    total[element] += 1
+                    equalized_b.append(star_rating)
+                    total[star_rating] += 1
+                    
             elif len(a[index]) > 150 and len(a[index]) <= 200:
                 if counter["200"] < no_of_words["200"]:
                     counter["200"] += 1
                     equalized_a.append(a[index])
-                    equalized_b.append(element)
-                    total[element] += 1
+                    equalized_b.append(star_rating)
+                    total[star_rating] += 1
+                    
             elif len(a[index]) > 200 and len(a[index]) <= 250:
                 if counter["250"] < no_of_words["250"]:
                     counter["250"] += 1
                     equalized_a.append(a[index])
-                    equalized_b.append(element)
-                    total[element] += 1
-            elif counter["300"] < no_of_words["300"]:
+                    equalized_b.append(star_rating)
+                    total[star_rating] += 1
+                    
+            else:
+                if counter["300"] < no_of_words["300"]:
                     counter["300"] += 1
                     equalized_a.append(a[index])
-                    equalized_b.append(element)
-                    total[element] += 1
+                    equalized_b.append(star_rating)
+                    total[star_rating] += 1
                     
 	# Balance data for each star rating
-    for index, element in enumerate(b):
-        if element == 1:
+    for index, star_rating in enumerate(b):
+        if star_rating == 1:
             equalizer(counter_1)
-        elif element == 2:
+        elif star_rating == 2:
             equalizer(counter_2)
-        elif element == 3:
+        elif star_rating == 3:
             equalizer(counter_3)
-        elif element == 4:
+        elif star_rating == 4:
             equalizer(counter_4)
         else:
             equalizer(counter_5)
+            
+    print(counter_1)
+    print(counter_2)
+    print(counter_3)
+    print(counter_4)
+    print(counter_5)
 
     return equalized_a, equalized_b
 
-def identify_token(text):
-#   Return it's text back, as requested as a token
+def identity_token(text):
+    # Return it's text back, as requested as a token
     return text
 
 "--------------------------------------------------------------------------------------------------------------------"
@@ -179,8 +193,9 @@ def identify_token(text):
 # Read the data from Excel file
 dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 t1 = datetime.datetime.now()
+
 # Data cleaning & pre-processing
-filtered_dataset = pre_process(dataset)
+filtered_dataset = pre_process(dataset[:2000])
 
 "--------------------------------------------------------------------------------------------------------------------"
 
@@ -199,7 +214,7 @@ print(datetime.datetime.now() - t1)
 print()
 
 # Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
-tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, 1), lowercase = False)
+tfidf_vectorizer = TfidfVectorizer(tokenizer = identity_token, ngram_range = (1, 1), lowercase = False)
 t2 = datetime.datetime.now()
 
 # Construct vocabulary and inverse document frequency from all the review texts

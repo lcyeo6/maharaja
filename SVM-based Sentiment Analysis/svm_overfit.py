@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 @description:
     
@@ -23,6 +22,8 @@ from sklearn.svm import SVC
 from sklearn import metrics
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 from sklearn.model_selection import KFold
+
+# Required to download conda install -c conda-forge imbalanced-learn
 from imblearn.over_sampling import ADASYN
 
 def read_excel(filename):
@@ -86,6 +87,7 @@ def identify_token(text):
 # Read the data from Excel file
 dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 t1 = datetime.datetime.now()
+
 # Data cleaning & pre-processing
 filtered_dataset = pre_process(dataset)
 
