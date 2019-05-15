@@ -68,7 +68,7 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     
     precision_macro.append(precision_score(y_test,y_pred,average='macro',labels=np.unique(y_pred)))
     recall_macro.append(recall_score(y_test,y_pred,average='macro'))
-    f1_micro.append(f1_score(y_test,y_pred,average='macro',labels=np.unique(y_pred)))
+    f1_macro.append(f1_score(y_test,y_pred,average='macro',labels=np.unique(y_pred)))
     
     precision_weight.append(precision_score(y_test,y_pred,average='weighted',labels=np.unique(y_pred)))
     recall_weight.append(recall_score(y_test,y_pred,average='weighted'))
