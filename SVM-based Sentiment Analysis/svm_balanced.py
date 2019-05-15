@@ -81,8 +81,6 @@ def class_equity(a, b):
     
     # The least common category will be the minimum equity
     maximum = occurrence.most_common()[-1][1]
-    print(occurrence)
-    print(maximum)
 
     # Serve as counter
     total = dict()
@@ -106,54 +104,53 @@ def class_equity(a, b):
     for i, e in enumerate(b):
         if e == 1:
             if len(a[i]) <= 50:
-                no_of_words["50"] +=1
-            elif len(a[i]) >50 and len(a[i]) <=100:
-                no_of_words["100"] +=1
-            elif len(a[i]) >100 and len(a[i]) <=150:
-                no_of_words["150"] +=1
-            elif len(a[i]) >150 and len(a[i]) <=200:
-                no_of_words["200"] +=1
-            elif len(a[i]) >200 and len(a[i]) <=250:
-                no_of_words["250"] +=1
+                no_of_words["50"] += 1
+            elif len(a[i]) > 50 and len(a[i]) <= 100:
+                no_of_words["100"] += 1
+            elif len(a[i]) > 100 and len(a[i]) <= 150:
+                no_of_words["150"] += 1
+            elif len(a[i]) > 150 and len(a[i]) <= 200:
+                no_of_words["200"] += 1
+            elif len(a[i]) > 200 and len(a[i]) <= 250:
+                no_of_words["250"] += 1
             else:
-                no_of_words["300"] +=1         
+                no_of_words["300"] += 1         
         
     def equalizer(counter):
 	# Balance the dataset by removing over-represented samples from two arrays
         if total[element] < maximum:
             if len(a[index]) <= 50:
                 if counter["50"] < no_of_words["50"]:
-                    counter["50"] +=1
+                    counter["50"] += 1
                     equalized_a.append(a[index])
                     equalized_b.append(element)
                     total[element] += 1
             elif len(a[index]) > 50 and len(a[index]) <= 100:
                 if counter["100"] < no_of_words["100"]:
-                    counter["100"] +=1
+                    counter["100"] += 1
                     equalized_a.append(a[index])
                     equalized_b.append(element)
                     total[element] += 1
             elif len(a[index]) > 100 and len(a[index]) <= 150:
                 if counter["150"] < no_of_words["150"]:
-                    counter["150"] +=1
+                    counter["150"] += 1
                     equalized_a.append(a[index])
                     equalized_b.append(element)
                     total[element] += 1
             elif len(a[index]) > 150 and len(a[index]) <= 200:
                 if counter["200"] < no_of_words["200"]:
-                    counter["200"] +=1
+                    counter["200"] += 1
                     equalized_a.append(a[index])
                     equalized_b.append(element)
                     total[element] += 1
             elif len(a[index]) > 200 and len(a[index]) <= 250:
                 if counter["250"] < no_of_words["250"]:
-                    counter["250"] +=1
+                    counter["250"] += 1
                     equalized_a.append(a[index])
                     equalized_b.append(element)
                     total[element] += 1
-            else:
-                if counter["300"] < no_of_words["300"]:
-                    counter["300"] +=1
+            elif counter["300"] < no_of_words["300"]:
+                    counter["300"] += 1
                     equalized_a.append(a[index])
                     equalized_b.append(element)
                     total[element] += 1
@@ -177,7 +174,7 @@ def identify_token(text):
 #   Return it's text back, as requested as a token
     return text
 
-"-----------------------------------------------------------------"
+"--------------------------------------------------------------------------------------------------------------------"
 
 # Read the data from Excel file
 dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
@@ -185,7 +182,7 @@ t1 = datetime.datetime.now()
 # Data cleaning & pre-processing
 filtered_dataset = pre_process(dataset)
 
-"-----------------------------------------------------------------"
+"--------------------------------------------------------------------------------------------------------------------"
 
 # Storing both normalized review texts and star ratings in repective arrays
 review_text = []
@@ -197,21 +194,23 @@ for index, row in filtered_dataset.iterrows():
 # Balance the data we are going to put into training and testing
 equalized_review_text, equalized_star_rating = class_equity(review_text, star_rating)
 
-print("PRE-process time")
+print("Pre-process Time")
 print(datetime.datetime.now() - t1)
+print()
 
 # Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
-tfidf_vectorizer = TfidfVectorizer(tokenizer=identify_token, ngram_range = (1, 1), lowercase=False)
+tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, 1), lowercase = False)
 t2 = datetime.datetime.now()
 
 # Construct vocabulary and inverse document frequency from all the review texts
 # Then, transform each review text into a tf-idf weighted document term matrix
 vectorized_data = tfidf_vectorizer.fit_transform(equalized_review_text)
 
-print("Vectorizing time")
+print("Vectorizing Time")
 print(datetime.datetime.now() - t2)
+print()
 
-"-----------------------------------------------------------------"
+"--------------------------------------------------------------------------------------------------------------------"
 
 def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
     # Perform training on the training set
@@ -231,49 +230,52 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     print (metrics.classification_report(y_test, y_pred))
     print ("Confusion Matrix:")
     print (metrics.confusion_matrix(y_test, y_pred))
+    print()
     
-	# Appending all the score into it's own list for averaging the score at the end.
-    precision_micro.append(precision_score(y_test,y_pred,average='micro',labels=np.unique(y_pred)))
-    recall_micro.append(recall_score(y_test,y_pred,average='micro'))
-    f1_micro.append(f1_score(y_test,y_pred,average='micro',labels=np.unique(y_pred)))
+	# Appending all the scores into it's own list for averaging the score at the end
+    precision_micro.append(precision_score(y_test, y_pred,average = 'micro', labels = np.unique(y_pred)))
+    recall_micro.append(recall_score(y_test, y_pred, average = 'micro'))
+    f1_micro.append(f1_score(y_test, y_pred, average = 'micro', labels = np.unique(y_pred)))
     
-    precision_macro.append(precision_score(y_test,y_pred,average='macro',labels=np.unique(y_pred)))
-    recall_macro.append(recall_score(y_test,y_pred,average='macro'))
-    f1_micro.append(f1_score(y_test,y_pred,average='macro',labels=np.unique(y_pred)))
+    precision_macro.append(precision_score(y_test, y_pred, average = 'macro', labels = np.unique(y_pred)))
+    recall_macro.append(recall_score(y_test, y_pred, average = 'macro'))
+    f1_macro.append(f1_score(y_test, y_pred, average = 'macro', labels = np.unique(y_pred)))
     
-    precision_weight.append(precision_score(y_test,y_pred,average='weighted',labels=np.unique(y_pred)))
-    recall_weight.append(recall_score(y_test,y_pred,average='weighted'))
-    f1_weight.append(f1_score(y_test,y_pred,average='weighted',labels=np.unique(y_pred)))
+    precision_weight.append(precision_score(y_test,y_pred,average = 'weighted', labels = np.unique(y_pred)))
+    recall_weight.append(recall_score(y_test, y_pred, average = 'weighted'))
+    f1_weight.append(f1_score(y_test, y_pred, average = 'weighted', labels = np.unique(y_pred)))
     
 # LinearSVC
-#svc_1 = LinearSVC()
+#svc = LinearSVC()
 
 # Normal SVC
-svc_1 = SVC(kernel='linear')
+svc = SVC(kernel = 'linear')
     
 # RBF
-#svc_1 = SVC(kernel='rbf')
+#svc = SVC(kernel='rbf')
 
-# List to store 10-fold of the scores
 accuracy_train = []
 accuracy_test = []
+
 precision_micro = []
 recall_micro = []
 f1_micro = []
+
 precision_macro = []
 recall_macro = []
 f1_macro = []
+
 precision_weight = []
 recall_weight = []
 f1_weight = []
 
 # To count which fold the program is currently at
-n=0
+n = 0
 
 # Split dataset into training and testing, using 10-fold classification
 kfold = KFold(10, True, 1)
 for train_index, test_index in kfold.split(vectorized_data, equalized_star_rating):
-    n+=1
+    n += 1
     print(n)
     t3 = datetime.datetime.now()
     X_train, X_test = vectorized_data[train_index], vectorized_data[test_index]
@@ -281,20 +283,25 @@ for train_index, test_index in kfold.split(vectorized_data, equalized_star_ratin
     y_test = [equalized_star_rating[i] for i in test_index]
 	
 	# Train and test the data
-    train_and_evaluate(svc_1, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)
+    train_and_evaluate(svc, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)
     
-    print("Train and test time")
+    print("Train and Test Time")
     print(datetime.datetime.now() - t3)
+    print()
+    print("------------------------------------------")
     
 # Print out the average scores
-print("accuracy_train: {}".format(np.mean(accuracy_train)))
-print("accuracy_test: {}".format(np.mean(accuracy_test)))
-print("precision micro: {}".format(np.mean(precision_micro)))
-print("recall micro: {}".format(np.mean(recall_micro)))
-print("f1 micro: {}".format(np.mean(f1_micro)))
-print("precision macro: {}".format(np.mean(precision_macro)))
-print("recall macro: {}".format(np.mean(recall_macro)))
-print("f1 macro: {}".format(np.mean(f1_macro)))
+print("accuracy train:   {}".format(np.mean(accuracy_train)))
+print("accuracy test:    {}".format(np.mean(accuracy_test)))
+print()
+print("precision micro:  {}".format(np.mean(precision_micro)))
+print("recall micro:     {}".format(np.mean(recall_micro)))
+print("f1 micro:         {}".format(np.mean(f1_micro)))
+print()
+print("precision macro:  {}".format(np.mean(precision_macro)))
+print("recall macro:     {}".format(np.mean(recall_macro)))
+print("f1 macro:         {}".format(np.mean(f1_macro)))
+print()
 print("precision weight: {}".format(np.mean(precision_weight)))
-print("recall weight: {}".format(np.mean(recall_weight)))
-print("f1 weight: {}".format(np.mean(f1_weight)))
+print("recall weight:    {}".format(np.mean(recall_weight)))
+print("f1 weight:        {}".format(np.mean(f1_weight)))
