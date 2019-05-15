@@ -185,6 +185,7 @@ def class_equity(a, b):
     return equalized_a, equalized_b
 
 def identity_token(text):
+    
     # Return it's text back, as requested as a token
     return text
 
@@ -192,10 +193,15 @@ def identity_token(text):
 
 # Read the data from Excel file
 dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
+
 t1 = datetime.datetime.now()
 
 # Data cleaning & pre-processing
 filtered_dataset = pre_process(dataset[:2000])
+
+print("Pre-process Time")
+print(datetime.datetime.now() - t1)
+print()
 
 "--------------------------------------------------------------------------------------------------------------------"
 
@@ -209,12 +215,9 @@ for index, row in filtered_dataset.iterrows():
 # Balance the data we are going to put into training and testing
 equalized_review_text, equalized_star_rating = class_equity(review_text, star_rating)
 
-print("Pre-process Time")
-print(datetime.datetime.now() - t1)
-print()
-
 # Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
 tfidf_vectorizer = TfidfVectorizer(tokenizer = identity_token, ngram_range = (1, 1), lowercase = False)
+
 t2 = datetime.datetime.now()
 
 # Construct vocabulary and inverse document frequency from all the review texts
@@ -228,6 +231,7 @@ print()
 "--------------------------------------------------------------------------------------------------------------------"
 
 def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
+    
     # Perform training on the training set
     clf.fit(X_train, y_train)
     

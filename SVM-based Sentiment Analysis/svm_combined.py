@@ -13,7 +13,6 @@ import pandas as pd
 import numpy as np
 import re
 import datetime
-from collections import Counter
 import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
@@ -75,33 +74,51 @@ def pre_process(dataset):
     return dataset
 
 def identify_token(text):
-#   Return it's text back, as requested as a token
+    
+    # Return it's text back, as requested as a token
     return text
+
+def actual_sentiment(data):
+    
+    # Convert star-rating into respective sentiments
+    for i in data:
+        if int(i[0]) == 4 or int(i[0]) == 5:
+            return "positive"
+        elif int(i[0]) == 1 or int(i[0]) == 2:
+            return "negative"
+        else:
+            return "neutral"
 
 "--------------------------------------------------------------------------------------------------------------------"
 
 # Read the data from Excel file
 dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
+
 t1 = datetime.datetime.now()
 
 # Data cleaning & pre-processing
 filtered_dataset = pre_process(dataset)
 
-"--------------------------------------------------------------------------------------------------------------------"
+filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)  
 
-# Storing both review texts and star ratings in repective arrays
-review_text = []
-star_rating = []
-for index, row in filtered_dataset.iterrows():
-    review_text.append(row[7])
-    star_rating.append(int(row[3][0]))
-    
+filtered_dataset = filtered_dataset[filtered_dataset.actual_sentiment != "neutral"]  
+
 print("Pre-process Time")
 print(datetime.datetime.now() - t1)
 print()
 
+"--------------------------------------------------------------------------------------------------------------------"
+
+# Storing both review texts and star ratings in repective arrays
+review_text = []
+sentiment = []
+for index, row in filtered_dataset.iterrows():
+    review_text.append(row[7])
+    sentiment.append(row[8])
+
 # Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
-tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, 2), lowercase = False)
+tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, 1), lowercase = False)
+
 t2 = datetime.datetime.now()
 
 # Construct vocabulary and inverse document frequency from all the review texts
@@ -115,6 +132,7 @@ print()
 "--------------------------------------------------------------------------------------------------------------------"
 
 def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
+    
     # Perform training on the training set
     clf.fit(X_train, y_train)
     
@@ -174,13 +192,13 @@ n = 0
 # Split dataset into training and testing using 10-fold classification
 kfold = KFold(10, True, 1)
 
-for train_index, test_index in kfold.split(vectorized_data, star_rating):
+for train_index, test_index in kfold.split(vectorized_data, sentiment):
     n += 1
     print(n)
     t3 = datetime.datetime.now()
     X_train, X_test = vectorized_data[train_index], vectorized_data[test_index]
-    y_train = [star_rating[i] for i in train_index]
-    y_test = [star_rating[i] for i in test_index]
+    y_train = [sentiment[i] for i in train_index]
+    y_test = [sentiment[i] for i in test_index]
 	
 	# Train and test the data
     accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight = train_and_evaluate(svc, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)

@@ -13,7 +13,6 @@ import pandas as pd
 import numpy as np
 import re
 import datetime
-from collections import Counter
 import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
@@ -75,17 +74,23 @@ def pre_process(dataset):
     return dataset
 
 def identify_token(text):
-#   Return it's text back, as requested as a token
+    
+    # Return it's text back, as requested as a token
     return text
 
 "--------------------------------------------------------------------------------------------------------------------"
 
 # Read the data from Excel file
 dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
+
 t1 = datetime.datetime.now()
 
 # Data cleaning & pre-processing
 filtered_dataset = pre_process(dataset)
+
+print("Pre-process Time")
+print(datetime.datetime.now() - t1)
+print()
 
 "--------------------------------------------------------------------------------------------------------------------"
 
@@ -95,13 +100,10 @@ star_rating = []
 for index, row in filtered_dataset.iterrows():
     review_text.append(row[7])
     star_rating.append(int(row[3][0]))
-    
-print("Pre-process Time")
-print(datetime.datetime.now() - t1)
-print()
 
 # Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
 tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, 2), lowercase = False)
+
 t2 = datetime.datetime.now()
 
 # Construct vocabulary and inverse document frequency from all the review texts
@@ -115,6 +117,7 @@ print()
 "--------------------------------------------------------------------------------------------------------------------"
 
 def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
+    
     # Perform training on the training set
     clf.fit(X_train, y_train)
     
