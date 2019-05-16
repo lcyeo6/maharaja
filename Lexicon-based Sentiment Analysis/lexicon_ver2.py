@@ -17,8 +17,7 @@ import nltk
 import matplotlib.pyplot as plt
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
 def read_excel(filename):
     
@@ -118,10 +117,12 @@ def predict_sentiment(data):
     
 filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)  
 
-filtered_dataset = filtered_dataset[filtered_dataset.actual_sentiment != "neutral"]  
-    
+filtered_dataset = filtered_dataset[filtered_dataset.actual_sentiment != "neutral"]
+
 # Predict sentiment score for each of the normalized review texts
 filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment)
+
+filtered_dataset = filtered_dataset[filtered_dataset.predicted_sentiment != "neutral"]
 
 "--------------------------------------------------------------------------------------------------------------------"
 
@@ -142,17 +143,24 @@ for index, row in filtered_dataset.iterrows():
     elif row[8] == "negative" and row[9] == "negative":
         total_negative += 1
     
-accuracy = accuracy_score(actual, predicted) * 100
+ACC = accuracy_score(actual, predicted) * 100
+CR = classification_report(actual, predicted)
+CM = confusion_matrix(actual, predicted)
     
 percentage_total_positive = (total_positive/total_data) * 100
 percentage_total_negative = (total_negative/total_data) * 100
     
 print()    
-print("Percentage of Accuracy: %.1f%%" % accuracy)
+print("Percentage of Accuracy: %.1f%%" % ACC)
+print()
+print("Classification Report")
+print(CR)
+print("Confusion Matrix")
+print(CM)
+print()
 print("Percentage of Total Positive: %.1f%%" % percentage_total_positive)
 print("Percentage of Total Negative: %.1f%%" % percentage_total_negative)
 print()   
-print(classification_report(actual, predicted))
 
 "--------------------------------------------------------------------------------------------------------------------"
  

@@ -17,8 +17,7 @@ import nltk
 import matplotlib.pyplot as plt
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
 def read_excel(filename):
     
@@ -169,7 +168,9 @@ for index, row in filtered_dataset.iterrows():
     if row[8] == 5 and row[9] == 5:
         five_star += 1
     
-accuracy = accuracy_score(actual, predicted) * 100
+ACC = accuracy_score(actual, predicted) * 100
+CR = classification_report(actual, predicted)
+CM = confusion_matrix(actual, predicted)
     
 percentage_one_star = (one_star/total_data) * 100
 percentage_two_star = (two_star/total_data) * 100
@@ -178,7 +179,13 @@ percentage_four_star = (four_star/total_data) * 100
 percentage_five_star = (five_star/total_data) * 100
     
 print()    
-print("Percentage of Accuracy: %.1f%%" % accuracy)
+print("Percentage of Accuracy: %.1f%%" % ACC)
+print()
+print("Classification Report")
+print(CR)
+print("Confusion Matrix")
+print(CM)
+print()
 print("Percentage of Correctly Estimated 1 Star: %.1f%%" % percentage_one_star)
 print("Percentage of Correctly Estimated 2 Star: %.1f%%" % percentage_two_star)
 print("Percentage of Correctly Estimated 3 Star: %.1f%%" % percentage_three_star)    
