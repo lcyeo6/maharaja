@@ -18,8 +18,7 @@ from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
-from sklearn import metrics
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, classification_report, confusion_matrix
 from sklearn.model_selection import KFold
 
 # Required to download conda install -c conda-forge imbalanced-learn
@@ -113,9 +112,9 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     y_pred = clf.predict(X_test)
     
     print ("Classification Report:")
-    print (metrics.classification_report(y_test, y_pred))
+    print (classification_report(y_test, y_pred))
     print ("Confusion Matrix:")
-    print (metrics.confusion_matrix(y_test, y_pred))
+    print (confusion_matrix(y_test, y_pred))
     print()
     
 	# Appending all the scores into it's own list for averaging the score at the end
