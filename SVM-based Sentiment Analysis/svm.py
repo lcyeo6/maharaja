@@ -78,6 +78,42 @@ def identify_token(text):
     # Return it's text back, as requested as a token
     return text
 
+def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
+    
+    # Perform training on the training set
+    clf.fit(X_train, y_train)
+    
+#    print ("Accuracy on training set:")
+#    print (clf.score(X_train, y_train))
+    accuracy_train.append(clf.score(X_train, y_train))
+#    print ("Accuracy on testing set:")
+#    print (clf.score(X_test, y_test))
+    accuracy_test.append(clf.score(X_test, y_test))
+    
+	# Predicting the training data used on the test data
+    y_pred = clf.predict(X_test)
+    
+    print ("Classification Report:")
+    print (metrics.classification_report(y_test, y_pred))
+    print ("Confusion Matrix:")
+    print (metrics.confusion_matrix(y_test, y_pred))
+    print()
+    
+	# Appending all the scores into it's own list for averaging the score at the end
+    precision_micro.append(precision_score(y_test, y_pred,average = 'micro', labels = np.unique(y_pred)))
+    recall_micro.append(recall_score(y_test, y_pred, average = 'micro'))
+    f1_micro.append(f1_score(y_test, y_pred, average = 'micro', labels = np.unique(y_pred)))
+    
+    precision_macro.append(precision_score(y_test, y_pred, average = 'macro', labels = np.unique(y_pred)))
+    recall_macro.append(recall_score(y_test, y_pred, average = 'macro'))
+    f1_macro.append(f1_score(y_test, y_pred, average = 'macro', labels = np.unique(y_pred)))
+    
+    precision_weight.append(precision_score(y_test,y_pred,average = 'weighted', labels = np.unique(y_pred)))
+    recall_weight.append(recall_score(y_test, y_pred, average = 'weighted'))
+    f1_weight.append(f1_score(y_test, y_pred, average = 'weighted', labels = np.unique(y_pred)))
+	
+    return accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight
+
 "--------------------------------------------------------------------------------------------------------------------"
 
 # Read the data from Excel file
@@ -114,47 +150,16 @@ print("Vectorizing Time")
 print(datetime.datetime.now() - t2)
 print()
 
-"--------------------------------------------------------------------------------------------------------------------"
-
-def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
-    
-    # Perform training on the training set
-    clf.fit(X_train, y_train)
-    
-#    print ("Accuracy on training set:")
-#    print (clf.score(X_train, y_train))
-    accuracy_train.append(clf.score(X_train, y_train))
-#    print ("Accuracy on testing set:")
-#    print (clf.score(X_test, y_test))
-    accuracy_test.append(clf.score(X_test, y_test))
-    
-	# Predicting the training data used on the test data
-    y_pred = clf.predict(X_test)
-    
-    print ("Classification Report:")
-    print (metrics.classification_report(y_test, y_pred))
-    print ("Confusion Matrix:")
-    print (metrics.confusion_matrix(y_test, y_pred))
-    print()
-    
-	# Appending all the scores into it's own list for averaging the score at the end
-    precision_micro.append(precision_score(y_test, y_pred,average = 'micro', labels = np.unique(y_pred)))
-    recall_micro.append(recall_score(y_test, y_pred, average = 'micro'))
-    f1_micro.append(f1_score(y_test, y_pred, average = 'micro', labels = np.unique(y_pred)))
-    
-    precision_macro.append(precision_score(y_test, y_pred, average = 'macro', labels = np.unique(y_pred)))
-    recall_macro.append(recall_score(y_test, y_pred, average = 'macro'))
-    f1_macro.append(f1_score(y_test, y_pred, average = 'macro', labels = np.unique(y_pred)))
-    
-    precision_weight.append(precision_score(y_test,y_pred,average = 'weighted', labels = np.unique(y_pred)))
-    recall_weight.append(recall_score(y_test, y_pred, average = 'weighted'))
-    f1_weight.append(f1_score(y_test, y_pred, average = 'weighted', labels = np.unique(y_pred)))
-	
-    return accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight
-    
+"--------------------------------------------------------------------------------------------------------------------"  
+  
+# LinearSVC
+#svc = LinearSVC()
 
 # Normal SVC
 svc = SVC(kernel = 'linear')
+    
+# RBF
+#svc = SVC(kernel='rbf')
 
 accuracy_train = []
 accuracy_test = []

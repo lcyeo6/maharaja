@@ -93,48 +93,6 @@ def actual_sentiment(data):
         else:
             return "neutral"
 
-"--------------------------------------------------------------------------------------------------------------------"
-
-# Read the data from Excel file
-dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
-
-t1 = datetime.datetime.now()
-
-# Data cleaning & pre-processing
-filtered_dataset = pre_process(dataset)
-
-filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)  
-
-filtered_dataset = filtered_dataset[filtered_dataset.actual_sentiment != "neutral"]  
-
-print("Pre-process Time")
-print(datetime.datetime.now() - t1)
-print()
-
-"--------------------------------------------------------------------------------------------------------------------"
-
-# Storing both review texts and star ratings in repective arrays
-review_text = []
-sentiment = []
-for index, row in filtered_dataset.iterrows():
-    review_text.append(row[7])
-    sentiment.append(row[8])
- 
-# Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
-tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, 1), lowercase = False)
-
-t2 = datetime.datetime.now()
-
-# Construct vocabulary and inverse document frequency from all the review texts
-# Then, transform each review text into a tf-idf weighted document term matrix
-vectorized_data = tfidf_vectorizer.fit_transform(review_text)
-
-print("Vectorizing Time")
-print(datetime.datetime.now() - t2)
-print()
-
-"--------------------------------------------------------------------------------------------------------------------"
-
 def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
 	
     # Overfit the training data using ADASYN
@@ -173,12 +131,58 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     recall_weight.append(recall_score(y_test, y_pred, average = 'weighted'))
     f1_weight.append(f1_score(y_test, y_pred, average = 'weighted', labels = np.unique(y_pred)))
     
+    return accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight
+
+"--------------------------------------------------------------------------------------------------------------------"
+
+# Read the data from Excel file
+dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
+
+t1 = datetime.datetime.now()
+
+# Data cleaning & pre-processing
+filtered_dataset = pre_process(dataset)
+
+filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)  
+
+filtered_dataset = filtered_dataset[filtered_dataset.actual_sentiment != "neutral"]  
+
+print("Pre-process Time")
+print(datetime.datetime.now() - t1)
+print()
+
+"--------------------------------------------------------------------------------------------------------------------"
+
+# Storing both review texts and star ratings in repective arrays
+review_text = []
+sentiment = []
+for index, row in filtered_dataset.iterrows():
+    review_text.append(row[7])
+    sentiment.append(row[8])
+ 
+# Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
+tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, 2), lowercase = False)
+
+t2 = datetime.datetime.now()
+
+# Construct vocabulary and inverse document frequency from all the review texts
+# Then, transform each review text into a tf-idf weighted document term matrix
+vectorized_data = tfidf_vectorizer.fit_transform(review_text)
+
+print("Vectorizing Time")
+print(datetime.datetime.now() - t2)
+print()
+
+"--------------------------------------------------------------------------------------------------------------------"
 
 # LinearSVC
 #svc = LinearSVC()
 
 # Normal SVC
 svc = SVC(kernel = 'linear')
+    
+# RBF
+#svc = SVC(kernel='rbf')
 
 accuracy_train = []
 accuracy_test = []
@@ -209,7 +213,7 @@ for train_index, test_index in kfold.split(vectorized_data, sentiment):
     y_test = [sentiment[i] for i in test_index]
 	
 	# Train and test the data
-    train_and_evaluate(svc, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)
+    accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight = train_and_evaluate(svc, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)
 	
     print("Train and Test Time")
     print(datetime.datetime.now() - t3)
