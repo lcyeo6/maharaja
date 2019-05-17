@@ -87,8 +87,10 @@ def actual_sentiment(data):
     for i in data:
         if int(i[0]) == 4 or int(i[0]) == 5:
             return "positive"
+        
         elif int(i[0]) == 1 or int(i[0]) == 2:
             return "negative"
+        
         else:
             return "neutral"
 
@@ -142,9 +144,7 @@ t1 = datetime.datetime.now()
 # Data cleaning & pre-processing
 filtered_dataset = pre_process(dataset)
 
-filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)  
-
-filtered_dataset = filtered_dataset[filtered_dataset.actual_sentiment != "neutral"]  
+filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)
 
 print("Pre-process Time")
 print(datetime.datetime.now() - t1)

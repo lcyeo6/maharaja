@@ -15,6 +15,7 @@ import pandas as pd
 import re
 import nltk
 import matplotlib.pyplot as plt
+from collections import Counter
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
@@ -70,6 +71,111 @@ def pre_process(dataset):
 
     return dataset
 
+def class_equity(a, b, c):
+    
+    # Count the frequency of each category
+    occurrence = Counter(b)
+    
+    # The least common category will be the minimum equity
+    maximum_sentiment = occurrence.most_common()[-1][0]
+    maximum_amount = occurrence.most_common()[-1][1]
+    
+    # Serve as counter
+    total = dict()
+    for category in occurrence.keys():
+        total[category] = 0
+
+    equalized_b = []
+    equalized_c = []
+	
+	# Number of words in the least number of reviews 
+    no_of_words = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
+	
+	# To check the number of words of the review text with the least amount of star rating
+    for i, sentiment in enumerate(b):
+        if sentiment == maximum_sentiment:
+            if len(a[i]) <= 50:
+                no_of_words["50"] += 1
+                
+            elif len(a[i]) > 50 and len(a[i]) <= 100:
+                no_of_words["100"] += 1
+                
+            elif len(a[i]) > 100 and len(a[i]) <= 150:
+                no_of_words["150"] += 1
+                
+            elif len(a[i]) > 150 and len(a[i]) <= 200:
+                no_of_words["200"] += 1
+                
+            elif len(a[i]) > 200 and len(a[i]) <= 250:
+                no_of_words["250"] += 1
+                
+            else:
+                no_of_words["300"] += 1  
+                
+    # Counter to keep track of the number of words of the review text with respective star rating
+    counter_positive = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
+    counter_negative = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
+    counter_neutral = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
+    
+    def equalizer(counter):
+        
+        # Balance the dataset by removing over-represented samples from two arrays
+        if total[sentiment] < maximum_amount:
+            if len(a[index]) <= 50:
+                if counter["50"] < no_of_words["50"]:
+                    counter["50"] += 1
+                    equalized_b.append(b[index])
+                    equalized_c.append(c[index])
+                    total[sentiment] += 1
+                    
+            elif len(a[index]) > 50 and len(a[index]) <= 100:
+                if counter["100"] < no_of_words["100"]:
+                    counter["100"] += 1
+                    equalized_b.append(b[index])
+                    equalized_c.append(c[index])
+                    total[sentiment] += 1
+                    
+            elif len(a[index]) > 100 and len(a[index]) <= 150:
+                if counter["150"] < no_of_words["150"]:
+                    counter["150"] += 1
+                    equalized_b.append(b[index])
+                    equalized_c.append(c[index])
+                    total[sentiment] += 1
+                    
+            elif len(a[index]) > 150 and len(a[index]) <= 200:
+                if counter["200"] < no_of_words["200"]:
+                    counter["200"] += 1
+                    equalized_b.append(b[index])
+                    equalized_c.append(c[index])
+                    total[sentiment] += 1
+                    
+            elif len(a[index]) > 200 and len(a[index]) <= 250:
+                if counter["250"] < no_of_words["250"]:
+                    counter["250"] += 1
+                    equalized_b.append(b[index])
+                    equalized_c.append(c[index])
+                    total[sentiment] += 1
+                    
+            else:
+                if counter["300"] < no_of_words["300"]:
+                    counter["300"] += 1
+                    equalized_b.append(b[index])
+                    equalized_c.append(c[index])
+                    total[sentiment] += 1
+                    
+	# Balance data for each star rating
+    for index, sentiment in enumerate(b):
+        if sentiment == "positive":
+            equalizer(counter_positive)
+            
+        elif sentiment == "negative":
+            equalizer(counter_negative)
+            
+        else:
+            equalizer(counter_neutral)
+
+    return equalized_b, equalized_c
+
 # Read the data from Excel file
 dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 
@@ -94,8 +200,10 @@ def actual_sentiment(data):
     for i in data:
         if int(i[0]) == 4 or int(i[0]) == 5:
             return "positive"
+        
         elif int(i[0]) == 1 or int(i[0]) == 2:
             return "negative"
+        
         else:
             return "neutral"
 
@@ -110,46 +218,37 @@ def predict_sentiment(data):
     
     if sentence_score > 0:
         return "positive"
+    
     elif sentence_score < 0:
         return "negative"
+    
     else:
         return "neutral"
     
 filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)  
 
-filtered_dataset = filtered_dataset[filtered_dataset.actual_sentiment != "neutral"]
-
 # Predict sentiment score for each of the normalized review texts
 filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment)
-
-filtered_dataset = filtered_dataset[filtered_dataset.predicted_sentiment != "neutral"]
 
 "--------------------------------------------------------------------------------------------------------------------"
 
 # Summary statistics
 
-total_data = len(filtered_dataset)
-total_positive = 0
-total_negative = 0
-
+review_text = []
 actual = []
 predicted = []
 
 for index, row in filtered_dataset.iterrows():
+    review_text.append(row[2])
     actual.append(row[8])
     predicted.append(row[9])
-    if row[8] == "positive" and row[9] == "positive":
-        total_positive += 1
-    elif row[8] == "negative" and row[9] == "negative":
-        total_negative += 1
+        
+equalized_actual, equalized_predicted = class_equity(review_text, actual, predicted)
     
-ACC = accuracy_score(actual, predicted) * 100
-CR = classification_report(actual, predicted)
-CM = confusion_matrix(actual, predicted)
-    
-percentage_total_positive = (total_positive/total_data) * 100
-percentage_total_negative = (total_negative/total_data) * 100
-    
+ACC = accuracy_score(equalized_actual, equalized_predicted) * 100
+CR = classification_report(equalized_actual, equalized_actual)
+CM = confusion_matrix(equalized_actual, equalized_actual)
+
 print()    
 print("Percentage of Accuracy: %.1f%%" % ACC)
 print()
@@ -158,9 +257,6 @@ print(CR)
 print("Confusion Matrix")
 print(CM)
 print()
-print("Percentage of Total Positive: %.1f%%" % percentage_total_positive)
-print("Percentage of Total Negative: %.1f%%" % percentage_total_negative)
-print()   
 
 "--------------------------------------------------------------------------------------------------------------------"
  
@@ -181,5 +277,4 @@ print()
 #plt.show()
     
 "--------------------------------------------------------------------------------------------------------------------"
-
 

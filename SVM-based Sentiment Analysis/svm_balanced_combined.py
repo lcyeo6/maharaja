@@ -117,6 +117,7 @@ def class_equity(a, b):
     # Counter to keep track of the number of words of the review text with respective star rating
     counter_positive = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
     counter_negative = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
+    counter_neutral = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
     
     def equalizer(counter):
         
@@ -168,8 +169,12 @@ def class_equity(a, b):
     for index, sentiment in enumerate(b):
         if sentiment == "positive":
             equalizer(counter_positive)
+            
         elif sentiment == "negative":
             equalizer(counter_negative)
+            
+        else:
+            equalizer(counter_neutral)
 
     return equalized_a, equalized_b
 
@@ -184,8 +189,10 @@ def actual_sentiment(data):
     for i in data:
         if int(i[0]) == 4 or int(i[0]) == 5:
             return "positive"
+        
         elif int(i[0]) == 1 or int(i[0]) == 2:
             return "negative"
+        
         else:
             return "neutral"
         
@@ -236,8 +243,6 @@ t1 = datetime.datetime.now()
 filtered_dataset = pre_process(dataset)
 
 filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)
-
-filtered_dataset = filtered_dataset[filtered_dataset.actual_sentiment != "neutral"]
 
 print("Pre-process Time")
 print(datetime.datetime.now() - t1)
