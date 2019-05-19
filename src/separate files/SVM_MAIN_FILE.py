@@ -20,8 +20,6 @@ import svm_overfit_combined
 
 "--------------------------------------------------------------------------------------------------------------------"
 
-t1 = datetime.datetime.now()
-
 # Read the data from Excel file & Data cleaning & pre-processing
 filtered_dataset = preprocess.pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 
