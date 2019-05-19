@@ -73,30 +73,11 @@ def pre_process(dataset):
 
     return dataset
 
-def ngrams(data):
-    
-    # Generate sequences of normalized words beginning from distinct elements of the list of normalized words
-    # The zip function takes the sequences as a list of inputs
-    # bigram = A sequence of two adjacent words
-    bigram = []
-    for i in list(zip(data, data[1:])):
-        bigram.append(' '.join(i))
-    
-    # Generate sequences of normalized words beginning from distinct elements of the list of normalized words
-    # The zip function takes the sequences as a list of inputs
-    # trigram = A sequence of three adjacent words
-    trigram = []
-    for j in list(zip(data, data[1:], data[2:])):
-        trigram.append(' '.join(j))
-    
-    return bigram + trigram
-
 # Read the data from Excel file
 dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 
 # Data cleaning & pre-processing
 filtered_dataset = pre_process(dataset)
-filtered_dataset["ngrams"] = filtered_dataset.normalized_review_text.apply(ngrams)
 
 filtered_dataset.to_excel("preprocessed.xlsx")
 
@@ -105,3 +86,20 @@ filtered_dataset.to_excel("preprocessed.xlsx")
 
 
 
+#def ngrams(data):
+#    
+#    # Generate sequences of normalized words beginning from distinct elements of the list of normalized words
+#    # The zip function takes the sequences as a list of inputs
+#    # bigram = A sequence of two adjacent words
+#    bigram = []
+#    for i in list(zip(data, data[1:])):
+#        bigram.append(' '.join(i))
+#    
+#    # Generate sequences of normalized words beginning from distinct elements of the list of normalized words
+#    # The zip function takes the sequences as a list of inputs
+#    # trigram = A sequence of three adjacent words
+#    trigram = []
+#    for j in list(zip(data, data[1:], data[2:])):
+#        trigram.append(' '.join(j))
+#    
+#    return bigram + trigram

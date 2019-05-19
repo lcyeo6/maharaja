@@ -18,7 +18,7 @@ import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, classification_report, confusion_matrix
 from sklearn.model_selection import KFold
 
@@ -271,10 +271,10 @@ print()
 "--------------------------------------------------------------------------------------------------------------------"
     
 # LinearSVC
-#svc = LinearSVC()
+svc = LinearSVC()
 
 # Normal SVC
-svc = SVC(kernel = 'linear')
+#svc = SVC(kernel = 'linear')
     
 # RBF
 #svc = SVC(kernel='rbf')

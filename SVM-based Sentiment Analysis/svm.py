@@ -137,7 +137,7 @@ for index, row in filtered_dataset.iterrows():
     star_rating.append(int(row[3][0]))
 
 # Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
-tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, 2), lowercase = False)
+tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, 1), lowercase = False)
 
 t2 = datetime.datetime.now()
 
