@@ -19,8 +19,12 @@ from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, classification_report, confusion_matrix
+from sklearn.svm import SVC
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, classification_report, confusion_matrix, roc_curve
 from sklearn.model_selection import KFold
+import matplotlib.pyplot as plt
+from scipy import interp
+
 
 def read_excel(filename):
     
@@ -271,10 +275,10 @@ print()
 "--------------------------------------------------------------------------------------------------------------------"
     
 # LinearSVC
-svc = LinearSVC()
+#svc = LinearSVC()
 
 # Normal SVC
-#svc = SVC(kernel = 'linear')
+svc = SVC(kernel = 'linear')
     
 # RBF
 #svc = SVC(kernel='rbf')
@@ -306,9 +310,54 @@ for train_index, test_index in kfold.split(vectorized_data, equalized_star_ratin
     X_train, X_test = vectorized_data[train_index], vectorized_data[test_index]
     y_train = [equalized_star_rating[i] for i in train_index]
     y_test = [equalized_star_rating[i] for i in test_index]
-	
-	# Train and test the data
-    accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight = train_and_evaluate(svc, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)
+	   
+    # Perform training on the training set
+    svc.fit(X_train, y_train)
+    
+    # Accuracy on training set
+    accuracy_train.append(svc.score(X_train, y_train))
+    
+    # Accuracy on testing set
+    accuracy_test.append(svc.score(X_test, y_test))
+    
+	# Predicting the training data used on the test data
+    y_pred = svc.predict(X_test)
+    
+    print ("Classification Report:")
+    print (classification_report(y_test, y_pred))
+    print ("Confusion Matrix:")
+    print (confusion_matrix(y_test, y_pred))
+    print()
+    
+#    ## GRAPH
+#    tprs = []
+#    base_fpr = np.linspace(0, 1, 101)
+#    plt.figure(figsize=(5, 5))
+#    
+#    fpr, tpr, _ = roc_curve(y_test, y_pred[:, 1])
+#    
+#    plt.plot(fpr, tpr, 'b', alpha=0.05)
+#    tpr = interp(base_fpr, fpr, tpr)
+#    tpr[0] = 0.0
+#    tprs.append(tpr)
+    
+	# Appending all the scores into it's own list for averaging the score at the end
+    precision_micro.append(precision_score(y_test, y_pred,average = 'micro', labels = np.unique(y_pred)))
+    recall_micro.append(recall_score(y_test, y_pred, average = 'micro'))
+    f1_micro.append(f1_score(y_test, y_pred, average = 'micro', labels = np.unique(y_pred)))
+    
+    precision_macro.append(precision_score(y_test, y_pred, average = 'macro', labels = np.unique(y_pred)))
+    recall_macro.append(recall_score(y_test, y_pred, average = 'macro'))
+    f1_macro.append(f1_score(y_test, y_pred, average = 'macro', labels = np.unique(y_pred)))
+    
+    precision_weight.append(precision_score(y_test,y_pred,average = 'weighted', labels = np.unique(y_pred)))
+    recall_weight.append(recall_score(y_test, y_pred, average = 'weighted'))
+    f1_weight.append(f1_score(y_test, y_pred, average = 'weighted', labels = np.unique(y_pred)))
+    
+    
+    
+    
+    
     
     print("Train and Test Time")
     print(datetime.datetime.now() - t3)
@@ -330,3 +379,9 @@ print()
 print("precision weight: {}".format(np.mean(precision_weight)))
 print("recall weight:    {}".format(np.mean(recall_weight)))
 print("f1 weight:        {}".format(np.mean(f1_weight)))
+
+hello = ["This is good food, good service"]
+
+hello_vector = tfidf_vectorizer.transform(hello)
+
+print(svc.predict(hello_vector))
