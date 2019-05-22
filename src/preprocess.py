@@ -23,6 +23,18 @@ from nltk import word_tokenize, pos_tag
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords, wordnet
 
+def wordnet_tag(tag):
+    
+    if tag.startswith('J'):
+        return wordnet.ADJ
+    elif tag.startswith('R'):
+        return wordnet.ADV
+    elif tag.startswith('N'):
+        return wordnet.NOUN
+    elif tag.startswith('V'):
+        return wordnet.VERB
+    return None
+
 def pre_process(filename):
     
     dataset = pd.read_excel(filename, sheet_name = "Sheet1")
@@ -48,7 +60,7 @@ def pre_process(filename):
         
         ## Use nltk.sent_tokenize for splitting the data into sentences
         # Split data into words
-        tokens = nltk.word_tokenize(letters)
+        tokens = word_tokenize(letters)
         
         # Convert tokenized words into tokenized lower-case words
         small_letters = []

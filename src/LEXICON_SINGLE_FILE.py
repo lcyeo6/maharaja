@@ -12,9 +12,25 @@
 """
 
 import pandas as pd
-import preprocess
+import datetime
 import matplotlib.pyplot as plt
+from preprocess import pre_process
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from nltk.corpus import wordnet
+from nltk.corpus import sentiwordnet
+
+def pre_process_MPQA(filename):
+    
+    MPQA_Lexicon = pd.read_csv(filename, header = None, names = ["Subjectivity", "Word", "Polarity Score"])
+    
+    # Construct a Python dictionary to hold the lexicon
+    MPQA = {}
+    
+    # Store each lexicon in a dictionary, e.g. {"Word": ("Subjectivity", "Polarity Score")}
+    for index, row in MPQA_Lexicon.iterrows():
+        MPQA[row[1]] = (row[0], int(row[2]))
+        
+    return MPQA
 
 def actual_sentiment_mpqa(data):
     
@@ -33,11 +49,11 @@ def predict_sentiment_mpqa(data):
     # Compute the sentence's sentiment score by total up the word's polarity score
     sentence_score = 0
     for i in data:
-        if i in MPQA:
-            sentence_score = sentence_score + MPQA[i][1]
-            if MPQA[i][0] == 'weaksubj':
+        if i[0] in MPQA:
+            sentence_score = sentence_score + MPQA[i[0]][1]
+            if MPQA[i[0]][0] == 'weaksubj':
                  weak_frequency += 1
-            elif MPQA[i][0] == 'strongsubj':
+            elif MPQA[i[0]][0] == 'strongsubj':
                  strong_frequency += 1
     
     # Strong negative
@@ -77,8 +93,8 @@ def predict_sentiment_combined(data):
     sentence_score = 0
     
     for i in data:
-        if i in MPQA:
-            sentence_score = sentence_score + MPQA[i][1]
+        if i[0] in MPQA:
+            sentence_score = sentence_score + MPQA[i[0]][1]
     
     if sentence_score > 0:
         return "positive"
@@ -86,50 +102,69 @@ def predict_sentiment_combined(data):
         return "negative"
     else:
         return "neutral"
+    
+def predict_sentiment_swn(data):
+    
+    sentiment_score = 0
+    for word, tag in data:
+        wordnet_synsets = wordnet.synsets(word, pos = tag)
+        if not wordnet_synsets:
+            continue
+        else:
+            wordnet_synset = wordnet_synsets[0]
+            sentiwordnet_synset = sentiwordnet.senti_synset(wordnet_synset.name())
+            sentiment_score += sentiwordnet_synset.pos_score() - sentiwordnet_synset.neg_score()
+    
+    if sentiment_score > 0:
+        return "positive"
+    elif sentiment_score < 0:
+        return "negative"
+    else:
+        return "neutral"
 
 "--------------------------------------------------------------------------------------------------------------------"
+
+t1 = datetime.datetime.now()
 
 # Read the data from Excel file and pre-process
-filtered_dataset = preprocess.pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
+filtered_dataset = pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 
 # Read the MPQA lexicon file from CSV file
-MPQA_Lexicon = pd.read_csv("MPQA/MPQA_Lexicon.csv", header = None, names = ["Subjectivity", "Word", "Polarity Score"])
+MPQA = pre_process_MPQA("MPQA/MPQA_Lexicon.csv")
+    
 
-# Construct a Python dictionary to hold the lexicon
-MPQA = {}
-
-# Store each lexicon in a dictionary, e.g. {"Word": ("Subjectivity", "Polarity Score")}
-for index, row in MPQA_Lexicon.iterrows():
-    MPQA[row[1]] = (row[0], int(row[2]))
-    
-    
-"---------RUN THIS FOR - STATISTICS  ------------------"
-filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_mpqa)    
-    
-# Predict sentiment score for each of the normalized review texts
-filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_mpqa)
+"--------- RUN THIS FOR - MPQA ------------------"
+#filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_mpqa)    
+#    
+#filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_mpqa)
 "----------------------------------------------------------"
 
-"---------RUN THIS FOR - SENTIMENT  ------------------"
+
+"--------- RUN THIS FOR - MPQA SENTIMENT  ------------------"
+filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_combined)    
+    
+filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_combined)
+"----------------------------------------------------------"
+
+
+"--------- RUN THIS FOR - MPQA ------------------"
 #filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_combined)    
 #    
-## Predict sentiment score for each of the normalized review texts
-#filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_combined)
+#filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_swn)
 "----------------------------------------------------------"
 
-filtered_dataset.to_excel("MPQA_Dataset.xlsx", index = False)
+
+print("Pre-process Time")
+print(datetime.datetime.now() - t1)
+print()
+
 
 "--------------------------------------------------------------------------------------------------------------------"
 
-"---------RUN THIS FOR - STATISTICS  ------------------"
+"--------- RUN THIS FOR - STATISTICS  ------------------"
 # Summary STATISTICS
 
-total_data = len(filtered_dataset)
-one_star = 0
-two_star = 0
-three_star = 0
-four_star = 0
-five_star = 0
+t2 = datetime.datetime.now()
 
 actual = []
 predicted = []
@@ -137,42 +172,24 @@ predicted = []
 for index, row in filtered_dataset.iterrows():
     actual.append(row[8])
     predicted.append(row[9])
-    
-    if row[8] == 1 and row[9] == 1:
-        one_star += 1
-    if row[8] == 2 and row[9] == 2:
-        two_star += 1
-    if row[8] == 3 and row[9] == 3:
-        three_star += 1
-    if row[8] == 4 and row[9] == 4:
-        four_star += 1
-    if row[8] == 5 and row[9] == 5:
-        five_star += 1
-    
-ACC = accuracy_score(actual, predicted) * 100
+
+ACC = accuracy_score(actual, predicted)
 CR = classification_report(actual, predicted)
 CM = confusion_matrix(actual, predicted)
     
-percentage_one_star = (one_star/total_data) * 100
-percentage_two_star = (two_star/total_data) * 100
-percentage_three_star = (three_star/total_data) * 100
-percentage_four_star = (four_star/total_data) * 100
-percentage_five_star = (five_star/total_data) * 100
-    
 print()    
-print("Percentage of Accuracy: %.1f%%" % ACC)
-print()
-print("Classification Report")
+print("Percentage of Accuracy:")
+print(ACC)
+print() 
+print("Classification Report:")
 print(CR)
-print("Confusion Matrix")
+print("Confusion Matrix:")
 print(CM)
 print()
-print("Percentage of Correctly Estimated 1 Star: %.1f%%" % percentage_one_star)
-print("Percentage of Correctly Estimated 2 Star: %.1f%%" % percentage_two_star)
-print("Percentage of Correctly Estimated 3 Star: %.1f%%" % percentage_three_star)    
-print("Percentage of Correctly Estimated 4 Star: %.1f%%" % percentage_four_star) 
-print("Percentage of Correctly Estimated 5 Star: %.1f%%" % percentage_five_star) 
-print()   
+
+print("Processing Time")
+print(datetime.datetime.now() - t2)
+print()
 "----------------------------------------------------------"
 
 "---------RUN THIS FOR - SENTIMENT  ------------------"

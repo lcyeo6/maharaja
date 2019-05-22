@@ -149,7 +149,7 @@ def identify_token(text):
 
 def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
     
-    "---------RUN THIS FOR - OVERFIT DATASET ------------------"
+    "--------- RUN THIS FOR - OVERFIT ------------------"
     # Overfit the training data using ADASYN
 #    sm = ADASYN()
 #    X_train, y_train = sm.fit_sample(X_train, y_train)
@@ -197,7 +197,7 @@ t1 = datetime.datetime.now()
 # Read the data from Excel file & Data cleaning & pre-processing
 filtered_dataset = preprocess.pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 
-"---------RUN THIS FOR - SENTIMENT ------------------"
+"--------- RUN THIS FOR - SENTIMENT ------------------"
 #filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)
 "----------------------------------------------------"
 
@@ -211,21 +211,27 @@ print()
 review_text = []
 star_rating = []
 for index, row in filtered_dataset.iterrows():
-    review_text.append(row[7])
     star_rating.append(int(row[3][0]))
-    "---------RUN THIS FOR - SENTIMENT ------------------"
+    tmp = []
+    for word, tag in row[7]:
+        tmp.append(word)
+    review_text.append(tmp)
+    
+    "--------- RUN THIS FOR - SENTIMENT ------------------"
 #    star_rating.append(row[8])
     "----------------------------------------------------"
 
-"---------RUN THIS FOR - BALANCED DATASET ------------------"
+
+"--------- RUN THIS FOR - BALANCED DATASET ------------------"
 # Balance the data we are going to put into training and testing
 review_text, star_rating = class_equity(review_text, star_rating)
 "-----------------------------------------------------------"
 
+
 # Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
 false_ans = True
 while false_ans == True:
-    user_input = int(input("Choose either 1: Unigram || 2: Unigram & Bigram"))
+    user_input = int(input("Choose either 1: Unigram || 2: Unigram & Bigram:/n"))
     if user_input == 1 or user_input == 2:
         false_ans = False
         break
@@ -241,10 +247,11 @@ print("Vectorizing Time")
 print(datetime.datetime.now() - t2)
 print()
 
+
 "--------------------------------------------------------------------------------------------------------------------" 
 false_ans_2 = True
 while false_ans_2 == True:
-    user_input_2 = int(input("Choose 1: Normal SVC || 2: Linear SVC || 3: RBF"))
+    user_input_2 = int(input("Choose 1: Normal SVC || 2: Linear SVC || 3: RBF/n"))
     if user_input_2 == 1 or user_input_2 == 2 or user_input_2 == 3:
         false_ans_2 = False
         
