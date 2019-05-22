@@ -16,13 +16,13 @@ import preprocess
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-def actual_sentiment_lex(data):
+def actual_sentiment_mpqa(data):
     
     # Convert string-format star rating into integer-format
     for i in data:
         return int(i[0])
 
-def predict_sentiment_lex(data):
+def predict_sentiment_mpqa(data):
     
     # Counter for weak subjectivity word
     weak_frequency = 0
@@ -89,7 +89,7 @@ def predict_sentiment_combined(data):
 
 "--------------------------------------------------------------------------------------------------------------------"
 
-# Read the data from Excel file & Data cleaning & pre-processing
+# Read the data from Excel file and pre-process
 filtered_dataset = preprocess.pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 
 # Read the MPQA lexicon file from CSV file
@@ -104,10 +104,10 @@ for index, row in MPQA_Lexicon.iterrows():
     
     
 "---------RUN THIS FOR - STATISTICS  ------------------"
-filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_lex)    
+filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_mpqa)    
     
 # Predict sentiment score for each of the normalized review texts
-filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_lex)
+filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_mpqa)
 "----------------------------------------------------------"
 
 "---------RUN THIS FOR - SENTIMENT  ------------------"

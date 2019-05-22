@@ -18,9 +18,10 @@
 
 import pandas as pd
 import re
-import nltk
+import datetime
+from nltk import word_tokenize, pos_tag
 from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
+from nltk.corpus import stopwords, wordnet
 
 def pre_process(filename):
     
@@ -57,18 +58,26 @@ def pre_process(filename):
         # Remove stop words 
         filtered = list(filter(lambda l: l not in stop_words, small_letters))
         
+        # Parts of Speech Tagging
+        tagged_filtered = pos_tag(filtered)
+        
         # Lemmatize using WordNet's built-in function
         lemmatized_words = []
-        for j in filtered:
-            lemmatized_words.append(lemmatizer.lemmatize(j, pos = "v"))
+        for word, tag in tagged_filtered:
+            wn_tag = wordnet_tag(tag)
+            if wn_tag not in (wordnet.ADJ, wordnet.ADV, wordnet.NOUN):
+                continue
+            lemmatized_word = lemmatizer.lemmatize(word, pos = wn_tag)
+            if not lemmatized_word:
+                continue
+            else:
+                lemmatized_words.append((lemmatized_word, wn_tag))
             
         return lemmatized_words
     
     # Apply text_normalization function
     dataset["normalized_review_text"] = dataset.review_text.apply(text_normalization)
 
-#    dataset.to_excel("preprocessed.xlsx")
-    
     return dataset
 
 
