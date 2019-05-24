@@ -89,7 +89,7 @@ def pre_process(filename):
     
     # Apply text_normalization function
     dataset["normalized_review_text"] = dataset.review_text.apply(text_normalization)
-
+    
     return dataset
 
 

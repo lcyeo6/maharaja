@@ -10,6 +10,7 @@
 """
 
 import numpy as np
+import pandas as pd
 import datetime
 import preprocess
 from imblearn.over_sampling import ADASYN
@@ -17,6 +18,7 @@ from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
 from sklearn.svm import LinearSVC
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import precision_score, recall_score, f1_score, classification_report, confusion_matrix
 from sklearn.model_selection import KFold
 
@@ -147,12 +149,23 @@ def identify_token(text):
     # Return it's text back, as requested as a token
     return text
 
-def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight):
+def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only):
     
-    "--------- RUN THIS FOR - OVERFIT ------------------"
+    "--------- OVERFIT ------------------"
     # Overfit the training data using ADASYN
-#    sm = ADASYN()
-#    X_train, y_train = sm.fit_sample(X_train, y_train)
+    if ask_once_only == False:
+        ask_once_only = True
+        false_ans_0 = True
+        if ask_overfit == True:
+            while false_ans_0 == True:
+                user_input_0 = input("Do you want to overfit this dataset? (y/n) ")
+                if user_input_0 == "y":
+                    sm = ADASYN()
+                    X_train, y_train = sm.fit_sample(X_train, y_train)
+                    false_ans_0 = False
+                    break
+                else:
+                    break
     "-----------------------------------------------------------"
 
     # Perform training on the training set
@@ -187,7 +200,7 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     recall_weight.append(recall_score(y_test, y_pred, average = 'weighted'))
     f1_weight.append(f1_score(y_test, y_pred, average = 'weighted', labels = np.unique(y_pred)))
 	
-    return accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight
+    return accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only
 
 "--------------------------------------------------------------------------------------------------------------------"
 "--------------------------------------------------------------------------------------------------------------------"
@@ -198,7 +211,16 @@ t1 = datetime.datetime.now()
 filtered_dataset = preprocess.pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 
 "--------- RUN THIS FOR - SENTIMENT ------------------"
-#filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)
+run_sentiment = False
+false_ans_1 = True
+user_input_1 = input("Do you want to tran & test using sentiments only? (y/n) ")
+while false_ans_1 == True:
+    if user_input_1 == "y":
+        run_sentiment = True
+        filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)
+        break
+    elif user_input_1 == "n":
+        break
 "----------------------------------------------------"
 
 print("Pre-process Time")
@@ -211,31 +233,44 @@ print()
 review_text = []
 star_rating = []
 for index, row in filtered_dataset.iterrows():
-    star_rating.append(int(row[3][0]))
+    if run_sentiment == True:
+        # Sentiment (Positive/Neutral/Negative)
+        star_rating.append(row[8])
+    else:
+        # 1-5 stars
+        star_rating.append(int(row[3][0]))
     tmp = []
     for word, tag in row[7]:
         tmp.append(word)
     review_text.append(tmp)
-    
-    "--------- RUN THIS FOR - SENTIMENT ------------------"
-#    star_rating.append(row[8])
-    "----------------------------------------------------"
 
-
-"--------- RUN THIS FOR - BALANCED DATASET ------------------"
 # Balance the data we are going to put into training and testing
-review_text, star_rating = class_equity(review_text, star_rating)
-"-----------------------------------------------------------"
+ask_overfit = False
+ask_once_only = False
+false_ans_2 = True
+
+"--------- BALANCE DATASET ------------------"
+while false_ans_2 == True:
+    user_input_2 = input("Do you want to balance dataset? (y/n)")
+    if user_input_2 == "y":      
+        review_text, star_rating = class_equity(review_text, star_rating)
+        break
+    elif user_input_2 == "n":
+        ask_overfit = True
+        break
+"--------- BALANCE DATASET ------------------"
 
 
 # Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
-false_ans = True
-while false_ans == True:
-    user_input = int(input("Choose either 1: Unigram || 2: Unigram & Bigram:/n"))
-    if user_input == 1 or user_input == 2:
-        false_ans = False
+"--------- UNIGRAM / BIGRAM ------------------"
+false_ans_3 = True
+while false_ans_3 == True:
+    user_input_3 = int(input("Choose either 1: Unigram || 2: Unigram & Bigram:"))
+    if user_input_3 == 1 or user_input_3 == 2:
+        false_ans_3 = False
         break
-tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, user_input), lowercase = False)
+tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, user_input_3), lowercase = False)
+"--------- UNIGRAM / BIGRAM ------------------"
 
 t2 = datetime.datetime.now()
 
@@ -247,23 +282,28 @@ print("Vectorizing Time")
 print(datetime.datetime.now() - t2)
 print()
 
-
 "--------------------------------------------------------------------------------------------------------------------" 
-false_ans_2 = True
-while false_ans_2 == True:
-    user_input_2 = int(input("Choose 1: Normal SVC || 2: Linear SVC || 3: RBF/n"))
-    if user_input_2 == 1 or user_input_2 == 2 or user_input_2 == 3:
-        false_ans_2 = False
+"--------- SVM / Random Forest ------------------"
+false_ans_4 = True
+while false_ans_4 == True:
+    user_input_4 = int(input("Choose 1: Normal SVC || 2: Linear SVC || 3: RBF || 4: Random Forest"))
+    if user_input_4 == 1 or user_input_4 == 2 or user_input_4 == 3 or user_input_4 == 4:
+        false_ans_4 = False
         
-if user_input_2 == 1:
+if user_input_4 == 1:
     # Normal SVC
     svc = SVC(kernel = 'linear')
-elif user_input_2 == 2:
+elif user_input_4 == 2:
     # LinearSVC
     svc = LinearSVC()
-else:
+elif user_input_4 == 3:
+    # RBF
     svc = SVC(kernel='rbf')
-
+else:
+    # Random Forest Classifier
+    svc = RandomForestClassifier(n_estimators=1000)
+"--------- SVM / Random Forest ------------------"
+    
 accuracy_train = []
 accuracy_test = []
 
@@ -294,7 +334,7 @@ for train_index, test_index in kfold.split(vectorized_data, star_rating):
     y_test = [star_rating[i] for i in test_index]
 	
 	# Train and test the data
-    accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight = train_and_evaluate(svc, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight)
+    accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only = train_and_evaluate(svc, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only)
     
     print("Train and Test Time")
     print(datetime.datetime.now() - t3)
