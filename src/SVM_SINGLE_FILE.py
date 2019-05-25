@@ -213,7 +213,7 @@ filtered_dataset = preprocess.pre_process("tripadvisor_co_uk-travel_restaurant_r
 "--------- RUN THIS FOR - SENTIMENT ------------------"
 run_sentiment = False
 false_ans_1 = True
-user_input_1 = input("Do you want to tran & test using sentiments only? (y/n) ")
+user_input_1 = input("Do you want to train & test using sentiments only? (y/n) ")
 while false_ans_1 == True:
     if user_input_1 == "y":
         run_sentiment = True
@@ -251,7 +251,7 @@ false_ans_2 = True
 
 "--------- BALANCE DATASET ------------------"
 while false_ans_2 == True:
-    user_input_2 = input("Do you want to balance dataset? (y/n)")
+    user_input_2 = input("Do you want to balance dataset? (y/n) ")
     if user_input_2 == "y":      
         review_text, star_rating = class_equity(review_text, star_rating)
         break
@@ -265,7 +265,7 @@ while false_ans_2 == True:
 "--------- UNIGRAM / BIGRAM ------------------"
 false_ans_3 = True
 while false_ans_3 == True:
-    user_input_3 = int(input("Choose either 1: Unigram || 2: Unigram & Bigram:"))
+    user_input_3 = int(input("Choose either 1: Unigram || 2: Unigram & Bigram: "))
     if user_input_3 == 1 or user_input_3 == 2:
         false_ans_3 = False
         break
@@ -286,7 +286,7 @@ print()
 "--------- SVM / Random Forest ------------------"
 false_ans_4 = True
 while false_ans_4 == True:
-    user_input_4 = int(input("Choose 1: Normal SVC || 2: Linear SVC || 3: RBF || 4: Random Forest"))
+    user_input_4 = int(input("Choose 1: Normal SVC || 2: Linear SVC || 3: RBF || 4: Random Forest "))
     if user_input_4 == 1 or user_input_4 == 2 or user_input_4 == 3 or user_input_4 == 4:
         false_ans_4 = False
         
