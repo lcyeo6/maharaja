@@ -93,7 +93,6 @@ def pre_process(filename):
     return dataset
 
 
-
 # Read from Excel & Data cleaning & pre-processing
 #filtered_dataset = pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 #

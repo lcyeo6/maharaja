@@ -1,7 +1,8 @@
 """
 @description:
     
-    SVM-based Sentiment Analysis
+    Sentiment Analysis on SVM & Random Forest
+    
 @author: 
     
     Wan Chee Tin
@@ -10,7 +11,6 @@
 """
 
 import numpy as np
-import pandas as pd
 import datetime
 import preprocess
 from imblearn.over_sampling import ADASYN
@@ -70,6 +70,10 @@ def class_equity(a, b):
     counter_4 = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
     counter_5 = {"50": 0, "100": 0, "150": 0, "200": 0, "250": 0, "300": 0}
     
+    def balanced_list(x, y):
+        equalized_a.append(x)
+        equalized_b.append(y)        
+    
     def equalizer(counter):
         
         # Balance the dataset by removing over-represented samples from two arrays
@@ -77,36 +81,31 @@ def class_equity(a, b):
             if len(a[index]) <= 50:
                 if counter["50"] < no_of_words["50"]:
                     counter["50"] += 1
-                    equalized_a.append(a[index])
-                    equalized_b.append(star_rating)
+                    balanced_list(a[index], star_rating)
                     total[star_rating] += 1
                     
             elif len(a[index]) > 50 and len(a[index]) <= 100:
                 if counter["100"] < no_of_words["100"]:
                     counter["100"] += 1
-                    equalized_a.append(a[index])
-                    equalized_b.append(star_rating)
+                    balanced_list(a[index], star_rating)
                     total[star_rating] += 1
                     
             elif len(a[index]) > 100 and len(a[index]) <= 150:
                 if counter["150"] < no_of_words["150"]:
                     counter["150"] += 1
-                    equalized_a.append(a[index])
-                    equalized_b.append(star_rating)
+                    balanced_list(a[index], star_rating)
                     total[star_rating] += 1
                     
             elif len(a[index]) > 150 and len(a[index]) <= 200:
                 if counter["200"] < no_of_words["200"]:
                     counter["200"] += 1
-                    equalized_a.append(a[index])
-                    equalized_b.append(star_rating)
+                    balanced_list(a[index], star_rating)
                     total[star_rating] += 1
                     
             elif len(a[index]) > 200 and len(a[index]) <= 250:
                 if counter["250"] < no_of_words["250"]:
                     counter["250"] += 1
-                    equalized_a.append(a[index])
-                    equalized_b.append(star_rating)
+                    balanced_list(a[index], star_rating)
                     total[star_rating] += 1
                     
             else:
@@ -136,11 +135,9 @@ def actual_sentiment(data):
     # Convert star-rating into respective sentiments
     for i in data:
         if int(i[0]) == 4 or int(i[0]) == 5:
-            return "positive"
-        
+            return "positive"   
         elif int(i[0]) == 1 or int(i[0]) == 2:
-            return "negative"
-        
+            return "negative"    
         else:
             return "neutral"
 
@@ -151,22 +148,19 @@ def identify_token(text):
 
 def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only):
     
-    "--------- OVERFIT ------------------"
     # Overfit the training data using ADASYN
     if ask_once_only == False:
         ask_once_only = True
         false_ans_0 = True
         if ask_overfit == True:
             while false_ans_0 == True:
-                user_input_0 = input("Do you want to overfit this dataset? (y/n) ")
+                user_input_0 = input("Do you want to overfit this dataset? (y/n)\n")
                 if user_input_0 == "y":
                     sm = ADASYN()
                     X_train, y_train = sm.fit_sample(X_train, y_train)
                     false_ans_0 = False
-                    break
                 else:
                     break
-    "-----------------------------------------------------------"
 
     # Perform training on the training set
     clf.fit(X_train, y_train)
@@ -202,32 +196,34 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
 	
     return accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only
 
-"--------------------------------------------------------------------------------------------------------------------"
-"--------------------------------------------------------------------------------------------------------------------"
+"-------------------------------------------------------------------------------------------------------------------"
+"-------------------------------------------------------------------------------------------------------------------"
 
+
+
+"---------------------------------------------------- PRE-PROCESS ----------------------------------------------------"
 t1 = datetime.datetime.now()
 
 # Read the data from Excel file & Data cleaning & pre-processing
 filtered_dataset = preprocess.pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 
-"--------- RUN THIS FOR - SENTIMENT ------------------"
-run_sentiment = False
-false_ans_1 = True
-user_input_1 = input("Do you want to train & test using sentiments only? (y/n) ")
-while false_ans_1 == True:
-    if user_input_1 == "y":
-        run_sentiment = True
-        filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)
-        break
-    elif user_input_1 == "n":
-        break
-"----------------------------------------------------"
-
-print("Pre-process Time")
-print(datetime.datetime.now() - t1)
-print()
+print("\nPre-process Time")
+print(datetime.datetime.now() - t1) 
 
 "--------------------------------------------------------------------------------------------------------------------"
+
+
+
+"---------------------------------------------------- SENTIMENT ----------------------------------------------------"
+run_sentiment = False
+input_sentiment = input("Do you want to train & test using sentiments only? (y/n)\n")
+while True:
+    if input_sentiment == "y":
+        filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)
+        run_sentiment = True
+        break
+    elif input_sentiment == "n":
+        break
 
 # Storing both review texts and star ratings in repective arrays
 review_text = []
@@ -237,40 +233,43 @@ for index, row in filtered_dataset.iterrows():
         # Sentiment (Positive/Neutral/Negative)
         star_rating.append(row[8])
     else:
-        # 1-5 stars
+        # 1-5 Star Ratings
         star_rating.append(int(row[3][0]))
     tmp = []
     for word, tag in row[7]:
         tmp.append(word)
     review_text.append(tmp)
 
+"-------------------------------------------------------------------------------------------------------------------"
+
+
+
+"------------------------------------------------- BALANCE DATASET -------------------------------------------------"
 # Balance the data we are going to put into training and testing
 ask_overfit = False
 ask_once_only = False
-false_ans_2 = True
 
-"--------- BALANCE DATASET ------------------"
-while false_ans_2 == True:
-    user_input_2 = input("Do you want to balance dataset? (y/n) ")
-    if user_input_2 == "y":      
+while True:
+    input_balance = input("Do you want to balance dataset? (y/n)\n")
+    if input_balance == "y":      
         review_text, star_rating = class_equity(review_text, star_rating)
         break
-    elif user_input_2 == "n":
+    elif input_balance == "n":
         ask_overfit = True
         break
-"--------- BALANCE DATASET ------------------"
+    
+"-------------------------------------------------------------------------------------------------------------------" 
 
 
+
+"------------------------------------------------------ TFIDF ------------------------------------------------------"
 # Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
-"--------- UNIGRAM / BIGRAM ------------------"
-false_ans_3 = True
-while false_ans_3 == True:
-    user_input_3 = int(input("Choose either 1: Unigram || 2: Unigram & Bigram: "))
-    if user_input_3 == 1 or user_input_3 == 2:
-        false_ans_3 = False
+while True:
+    input_ngram = int(input("Choose either 1: Unigram || 2: Unigram & Bigram:\n"))
+    if input_ngram == 1 or input_ngram == 2:
         break
-tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, user_input_3), lowercase = False)
-"--------- UNIGRAM / BIGRAM ------------------"
+        
+tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, input_ngram), lowercase = False)
 
 t2 = datetime.datetime.now()
 
@@ -278,32 +277,39 @@ t2 = datetime.datetime.now()
 # Then, transform each review text into a tf-idf weighted document term matrix
 vectorized_data = tfidf_vectorizer.fit_transform(review_text)
 
-print("Vectorizing Time")
+print("\nVectorizing Time")
 print(datetime.datetime.now() - t2)
-print()
 
-"--------------------------------------------------------------------------------------------------------------------" 
-"--------- SVM / Random Forest ------------------"
-false_ans_4 = True
-while false_ans_4 == True:
-    user_input_4 = int(input("Choose 1: Normal SVC || 2: Linear SVC || 3: RBF || 4: Random Forest "))
-    if user_input_4 == 1 or user_input_4 == 2 or user_input_4 == 3 or user_input_4 == 4:
-        false_ans_4 = False
+"-------------------------------------------------------------------------------------------------------------------" 
+
+
+
+"----------------------------------------------- SVM / RANDOM FOREST -----------------------------------------------"
+while True:
+    input_model = int(input("Choose 1: Normal SVC || 2: Linear SVC || 3: RBF || 4: Random Forest\n"))
+    if input_model == 1 or input_model == 2 or input_model == 3 or input_model == 4:
+        break
         
-if user_input_4 == 1:
-    # Normal SVC
-    svc = SVC(kernel = 'linear')
-elif user_input_4 == 2:
-    # LinearSVC
-    svc = LinearSVC()
-elif user_input_4 == 3:
-    # RBF
-    svc = SVC(kernel='rbf')
-else:
-    # Random Forest Classifier
-    svc = RandomForestClassifier(n_estimators=1000)
-"--------- SVM / Random Forest ------------------"
+# Normal SVC
+if input_model == 1:
+    model = SVC(kernel = 'linear')
     
+# LinearSVC
+elif input_model == 2:             
+    model = LinearSVC()
+    
+# RBF
+elif input_model == 3:             
+    model = SVC(kernel='rbf')         
+    
+# Random Forest Classifier
+else:
+    model = RandomForestClassifier(n_estimators = 1000)
+    
+"-------------------------------------------------------------------------------------------------------------------"
+
+
+
 accuracy_train = []
 accuracy_test = []
 
@@ -329,17 +335,17 @@ for train_index, test_index in kfold.split(vectorized_data, star_rating):
     n += 1
     print(n)
     t3 = datetime.datetime.now()
+    
     X_train, X_test = vectorized_data[train_index], vectorized_data[test_index]
     y_train = [star_rating[i] for i in train_index]
     y_test = [star_rating[i] for i in test_index]
 	
 	# Train and test the data
-    accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only = train_and_evaluate(svc, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only)
+    accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only = train_and_evaluate(model, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only)
     
     print("Train and Test Time")
     print(datetime.datetime.now() - t3)
     print()
-    print("------------------------------------------")
 
 # Print out the average scores 
 print("accuracy train:   {}".format(np.mean(accuracy_train)))

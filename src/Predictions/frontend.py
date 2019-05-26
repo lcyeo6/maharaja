@@ -62,8 +62,9 @@ tk.Button(bottom_frame,text="Lexicon", width=12, bg="blue", font="Verdana 13", c
 # Clear button
 tk.Button(bottom_frame, text="Clear", width=12, bg="red", font="Verdana 13", command=clear).pack(side = "bottom", pady = 100)
 
+
 # Predicted SVM score
-tk.Label(top_frame, text="Predicted Stars - SVM", font="Verdana 15").pack()
+tk.Label(top_frame, text="Predicted Star Rating - SVM", font="Verdana 15").pack()
 tk.Label(top_frame, textvariable = s, font = "Verdana 13").pack()
 
 # Predicted Lexicon sentiment

@@ -2,7 +2,7 @@
 
 @description:
     
-    Lexicon-based Sentiment Analysis
+    Sentiment Analysis on MPQA & SentiWordNet
 
 @author: 
     
@@ -121,9 +121,13 @@ def predict_sentiment_swn(data):
         return "negative"
     else:
         return "neutral"
-
+    
+"--------------------------------------------------------------------------------------------------------------------"
 "--------------------------------------------------------------------------------------------------------------------"
 
+
+
+"---------------------------------------------------- PRE-PROCESS ----------------------------------------------------"
 t1 = datetime.datetime.now()
 
 # Read the data from Excel file and pre-process
@@ -131,37 +135,45 @@ filtered_dataset = pre_process("tripadvisor_co_uk-travel_restaurant_reviews_samp
 
 # Read the MPQA lexicon file from CSV file
 MPQA = pre_process_MPQA("MPQA/MPQA_Lexicon.csv")
-    
-
-"--------- RUN THIS FOR - MPQA ------------------"
-#filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_mpqa)    
-#    
-#filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_mpqa)
-"----------------------------------------------------------"
-
-
-"--------- RUN THIS FOR - MPQA SENTIMENT  ------------------"
-filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_combined)    
-    
-filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_combined)
-"----------------------------------------------------------"
-
-
-"--------- RUN THIS FOR - MPQA ------------------"
-#filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_combined)    
-#    
-#filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_swn)
-"----------------------------------------------------------"
-
 
 print("Pre-process Time")
 print(datetime.datetime.now() - t1)
 print()
 
-
 "--------------------------------------------------------------------------------------------------------------------"
+    
 
-"--------- RUN THIS FOR - STATISTICS  ------------------"
+
+"------------------------------------------------------ MPQA ------------------------------------------------------"
+#filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_mpqa)    
+#    
+#filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_mpqa)
+"------------------------------------------------------------------------------------------------------------------"
+
+
+
+"------------------------------------------------- MPQA SENTIMENT -------------------------------------------------"
+filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_combined)    
+    
+filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_combined)
+"------------------------------------------------------------------------------------------------------------------"
+
+
+
+"--------------------------------------------- SENTIWORDNET SENTIMENT ---------------------------------------------"
+#filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_combined)    
+#    
+#filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_swn)
+"------------------------------------------------------------------------------------------------------------------"
+
+
+
+
+"-------------------------------------------------------------------------------------------------------------------"
+
+
+
+"--------------------------------------------- STATISTIC - STAR RATING ---------------------------------------------"
 # Summary STATISTICS
 
 t2 = datetime.datetime.now()
@@ -190,9 +202,11 @@ print()
 print("Processing Time")
 print(datetime.datetime.now() - t2)
 print()
-"----------------------------------------------------------"
+"-------------------------------------------------------------------------------------------------------------------"
 
-"---------RUN THIS FOR - SENTIMENT  ------------------"
+
+
+"---------------------------------------------- STATISTIC - SENTIMENT ----------------------------------------------"
 ## Summary SENTIMENTS
 #actual = []
 #predicted = []
@@ -213,11 +227,12 @@ print()
 #print("Confusion Matrix")
 #print(CM)
 #print()
-"----------------------------------------------------------"
+"-------------------------------------------------------------------------------------------------------------------"
 
-"--------------------------------------------------------------------------------------------------------------------"
- 
-# Bar Chart for Sentiment Percentage
+
+
+"-------------------------------------------------------------------------------------------------------------------"
+ # Bar Chart for Sentiment Percentage
 
 #x = [1, 2, 3]
 #y = [percentage_negative, percentage_positive, percentage_neutral]
@@ -233,6 +248,6 @@ print()
 #
 #plt.show()
     
-"--------------------------------------------------------------------------------------------------------------------"
+"-------------------------------------------------------------------------------------------------------------------"
 
 
