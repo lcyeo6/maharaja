@@ -26,7 +26,7 @@ def lex():
     return None
     
 def clear():
-    user_input.delete(0, END)
+    user_input.delete(0, "end")
     s.set("")
     l.set("")
     return None
@@ -54,13 +54,13 @@ user_input.pack(pady = 10)
 
 # Buttons
 # SVM Button
-tk.Button(bottom_frame,text="SVM", width=12, bg="yellow", font="Verdana 13", command=svm).pack(side= RIGHT, padx= 100)
+tk.Button(bottom_frame,text="SVM", width=12, bg="yellow", font="Verdana 13", command=svm).pack(side= "right", padx= 100)
 
 # Lexicon Button
-tk.Button(bottom_frame,text="Lexicon", width=12, bg="blue", font="Verdana 13", command=lex).pack(side= LEFT, padx= 100)
+tk.Button(bottom_frame,text="Lexicon", width=12, bg="blue", font="Verdana 13", command=lex).pack(side= "left", padx= 100)
 
 # Clear button
-tk.Button(bottom_frame, text="Clear", width=12, bg="red", font="Verdana 13", command=clear).pack(side = BOTTOM, pady = 100)
+tk.Button(bottom_frame, text="Clear", width=12, bg="red", font="Verdana 13", command=clear).pack(side = "bottom", pady = 100)
 
 # Predicted SVM score
 tk.Label(top_frame, text="Predicted Stars - SVM", font="Verdana 15").pack()
