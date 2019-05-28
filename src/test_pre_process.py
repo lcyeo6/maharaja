@@ -12,12 +12,20 @@
 """
 
 import unittest
-import pre_process
+import preprocess
+from nltk.corpus import wordnet
 
 class Test_Preprocess(unittest.TestCase):
     
-    def test_class_equity(self):
-        self.assertEqual(pre_process.class_equity(),)
+    def test_wordnet_tag(self):
+        self.assertEqual(preprocess.wordnet_tag("JJR"), wordnet.ADJ)
+        self.assertEqual(preprocess.wordnet_tag("RBR"), wordnet.ADV)
+        self.assertEqual(preprocess.wordnet_tag("NNS"), wordnet.NOUN)
+        self.assertEqual(preprocess.wordnet_tag("VB"), wordnet.VERB)
+        
+#    def test_pre_process(self):
+#        self.assertEqual(preprocess.pre_process("JJR"), wordnet.ADJ)
+
     
 if __name__ == '__main__':
     unittest.main()
