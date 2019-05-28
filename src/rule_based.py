@@ -13,7 +13,6 @@
 
 import pandas as pd
 import datetime
-import matplotlib.pyplot as plt
 from preprocess import pre_process
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from nltk.corpus import wordnet
@@ -128,17 +127,17 @@ def predict_sentiment_swn(data):
 
 
 "---------------------------------------------------- PRE-PROCESS ----------------------------------------------------"
-t1 = datetime.datetime.now()
-
-# Read the data from Excel file and pre-process
-filtered_dataset = pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
-
+#t1 = datetime.datetime.now()
+#
+## Read the data from Excel file and pre-process
+#filtered_dataset = pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
+#
 # Read the MPQA lexicon file from CSV file
 MPQA = pre_process_MPQA("MPQA/MPQA_Lexicon.csv")
 
-print("Pre-process Time")
-print(datetime.datetime.now() - t1)
-print()
+#print("Pre-process Time")
+#print(datetime.datetime.now() - t1)
+#print()
 
 "--------------------------------------------------------------------------------------------------------------------"
     
@@ -153,9 +152,9 @@ print()
 
 
 "------------------------------------------------- MPQA SENTIMENT -------------------------------------------------"
-filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_combined)    
-    
-filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_combined)
+#filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment_combined)    
+#    
+#filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_text.apply(predict_sentiment_combined)
 "------------------------------------------------------------------------------------------------------------------"
 
 
@@ -175,33 +174,26 @@ filtered_dataset["predicted_sentiment"] = filtered_dataset.normalized_review_tex
 
 "--------------------------------------------- STATISTIC - STAR RATING ---------------------------------------------"
 # Summary STATISTICS
-
-t2 = datetime.datetime.now()
-
-actual = []
-predicted = []
-
-for index, row in filtered_dataset.iterrows():
-    actual.append(row[8])
-    predicted.append(row[9])
-
-ACC = accuracy_score(actual, predicted)
-CR = classification_report(actual, predicted)
-CM = confusion_matrix(actual, predicted)
-    
-print()    
-print("Percentage of Accuracy:")
-print(ACC)
-print() 
-print("Classification Report:")
-print(CR)
-print("Confusion Matrix:")
-print(CM)
-print()
-
-print("Processing Time")
-print(datetime.datetime.now() - t2)
-print()
+#actual = []
+#predicted = []
+#
+#for index, row in filtered_dataset.iterrows():
+#    actual.append(row[8])
+#    predicted.append(row[9])
+#
+#ACC = accuracy_score(actual, predicted)
+#CR = classification_report(actual, predicted)
+#CM = confusion_matrix(actual, predicted)
+#    
+#print()    
+#print("Percentage of Accuracy:")
+#print(ACC)
+#print() 
+#print("Classification Report:")
+#print(CR)
+#print("Confusion Matrix:")
+#print(CM)
+#print()
 "-------------------------------------------------------------------------------------------------------------------"
 
 
@@ -228,26 +220,3 @@ print()
 #print(CM)
 #print()
 "-------------------------------------------------------------------------------------------------------------------"
-
-
-
-"-------------------------------------------------------------------------------------------------------------------"
- # Bar Chart for Sentiment Percentage
-
-#x = [1, 2, 3]
-#y = [percentage_negative, percentage_positive, percentage_neutral]
-#
-#x_label = ["Negative", "Positive", "Neutral"]    
-#
-#plt.bar(x, y, tick_label = x_label, width = 0.6, color = ["red", "green", "blue"])  
-#
-#plt.xlabel("Sentiment")
-#plt.ylabel("Percentage")
-#
-#plt.title("Bar Chart")
-#
-#plt.show()
-    
-"-------------------------------------------------------------------------------------------------------------------"
-
-

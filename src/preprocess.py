@@ -18,7 +18,6 @@
 
 import pandas as pd
 import re
-import datetime
 from nltk import word_tokenize, pos_tag
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords, wordnet
@@ -97,32 +96,3 @@ def pre_process(filename):
 #filtered_dataset = pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
 #
 #filtered_dataset.to_excel("preprocessed.xlsx")
-
-
-
-# Read the data from Excel file
-#dataset = read_excel("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
-
-#def read_excel(filename):
-#    
-#    dataset = pd.read_excel(filename, sheet_name = "Sheet1")
-#    
-#    return dataset
-
-#def ngrams(data):
-#    
-#    # Generate sequences of normalized words beginning from distinct elements of the list of normalized words
-#    # The zip function takes the sequences as a list of inputs
-#    # bigram = A sequence of two adjacent words
-#    bigram = []
-#    for i in list(zip(data, data[1:])):
-#        bigram.append(' '.join(i))
-#    
-#    # Generate sequences of normalized words beginning from distinct elements of the list of normalized words
-#    # The zip function takes the sequences as a list of inputs
-#    # trigram = A sequence of three adjacent words
-#    trigram = []
-#    for j in list(zip(data, data[1:], data[2:])):
-#        trigram.append(' '.join(j))
-#    
-#    return bigram + trigram

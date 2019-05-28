@@ -160,9 +160,9 @@ svc = SVC(kernel = 'linear')
 # RBF
 #svc = SVC(kernel='rbf')
 
-from sklearn.ensemble import RandomForestClassifier
+#from sklearn.ensemble import RandomForestClassifier
 # Random Forest Classifier
-svc = RandomForestClassifier(n_estimators=1000)
+#svc = RandomForestClassifier(n_estimators=1000)
 
 accuracy_train = []
 accuracy_test = []

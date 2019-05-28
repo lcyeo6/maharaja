@@ -45,7 +45,7 @@ for index, row in filtered_dataset.iterrows():
     review_text.append(tmp)
 
 # Vectorize review text into unigram and evaluates into a term document matrix of TF-IDF features
-tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, 1), lowercase = False)
+tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, 2), lowercase = False)
 
 t2 = datetime.datetime.now()
 

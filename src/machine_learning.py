@@ -13,6 +13,7 @@
 import numpy as np
 import datetime
 import preprocess
+
 from imblearn.over_sampling import ADASYN
 from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -164,7 +165,7 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
 
     # Perform training on the training set
     clf.fit(X_train, y_train)
-    
+
 #    print ("Accuracy on training set:")
 #    print (clf.score(X_train, y_train))
     accuracy_train.append(clf.score(X_train, y_train))
@@ -174,7 +175,7 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     
 	# Predicting the training data used on the test data
     y_pred = clf.predict(X_test)
-    
+
     print ("Classification Report:")
     print (classification_report(y_test, y_pred))
     print ("Confusion Matrix:")
