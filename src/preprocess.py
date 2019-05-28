@@ -9,11 +9,6 @@
     Wan Chee Tin
     Yeo Lin Chung
     
-@update:
-
-    1. (06/03/2019) 2 rows of data were removed from the Excel file because both consist of date in 'rating' column.
-    2. (12/03/2019) Added comments for each function.
-    
 """
 
 import pandas as pd
@@ -38,6 +33,7 @@ def pre_process(filename):
     
     dataset = pd.read_excel(filename, sheet_name = "Sheet1")
     
+    "Note: Specific the columns if new dataset is used"
     # Remove unwanted columns
     dataset = dataset.drop(["uniq_id", "url", "restaurant_id", "restaurant_location", "category", "review_date", "author", "author_url", "location", "visited_on"], axis = 1)
     
@@ -46,8 +42,6 @@ def pre_process(filename):
     
     # Generate a list of stop words such as {'i', 'a', 'the', ...}
     stop_words = set(stopwords.words("english"))
-    # To add additional words into the list, just use the append method as follows.
-    # stopwords.append(<new_word>)
     
     lemmatizer = WordNetLemmatizer()
     
