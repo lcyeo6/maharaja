@@ -37,7 +37,7 @@ window.geometry("1000x470")
 window.resizable(width=False, height=False)
 
 # Title
-window.title("Predicting your reviews")
+window.title("Review Prediction")
 top_frame = tk.Frame(window).pack()
 bottom_frame = tk.Frame(window).pack(side = "bottom")
 
