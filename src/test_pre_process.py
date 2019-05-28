@@ -12,12 +12,12 @@
 """
 
 import unittest
-import machine_learning
+import pre_process
 
-class Test_MachineLearning(unittest.TestCase):
+class Test_Preprocess(unittest.TestCase):
     
     def test_class_equity(self):
-        self.assertEqual(machine_learning.class_equity(),)
+        self.assertEqual(pre_process.class_equity(),)
     
 if __name__ == '__main__':
     unittest.main()
