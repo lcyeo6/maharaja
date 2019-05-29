@@ -214,34 +214,15 @@ print(datetime.datetime.now() - t1)
 "--------------------------------------------------------------------------------------------------------------------"
 
 
-
-"---------------------------------------------------- SENTIMENT ----------------------------------------------------"
-run_sentiment = False
-input_sentiment = input("Do you want to train & test using sentiments only? (y/n)\n")
-while True:
-    if input_sentiment == "y":
-        filtered_dataset["actual_sentiment"] = filtered_dataset.rating.apply(actual_sentiment)
-        run_sentiment = True
-        break
-    elif input_sentiment == "n":
-        break
-
 # Storing both review texts and star ratings in repective arrays
 review_text = []
 star_rating = []
 for index, row in filtered_dataset.iterrows():
-    if run_sentiment == True:
-        # Sentiment (Positive/Neutral/Negative)
-        star_rating.append(row[8])
-    else:
-        # 1-5 Star Ratings
-        star_rating.append(int(row[3][0]))
+    star_rating.append(int(row[3][0]))
     tmp = []
     for word, tag in row[7]:
         tmp.append(word)
     review_text.append(tmp)
-
-"-------------------------------------------------------------------------------------------------------------------"
 
 
 
