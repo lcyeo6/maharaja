@@ -131,17 +131,6 @@ def class_equity(a, b):
 
     return equalized_a, equalized_b
 
-def actual_sentiment(data):
-    
-    # Convert star-rating into respective sentiments
-    for i in data:
-        if int(i[0]) == 4 or int(i[0]) == 5:
-            return "positive"   
-        elif int(i[0]) == 1 or int(i[0]) == 2:
-            return "negative"    
-        else:
-            return "neutral"
-
 def identify_token(text):
     
     # Return it's text back, as requested as a token
@@ -166,11 +155,7 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     # Perform training on the training set
     clf.fit(X_train, y_train)
 
-#    print ("Accuracy on training set:")
-#    print (clf.score(X_train, y_train))
     accuracy_train.append(clf.score(X_train, y_train))
-#    print ("Accuracy on testing set:")
-#    print (clf.score(X_test, y_test))
     accuracy_test.append(clf.score(X_test, y_test))
     
 	# Predicting the training data used on the test data
@@ -273,7 +258,7 @@ elif input_model == 2:
     
 # Random Forest Classifier
 else:
-    model = RandomForestClassifier(n_estimators = 1000)
+    model = RandomForestClassifier(n_estimators = 250)
     
 "-------------------------------------------------------------------------------------------------------------------"
 
@@ -300,6 +285,7 @@ for train_index, test_index in kfold.split(vectorized_data, star_rating):
     X_train, X_test = vectorized_data[train_index], vectorized_data[test_index]
     y_train = [star_rating[i] for i in train_index]
     y_test = [star_rating[i] for i in test_index]
+    
 	
 	# Train and test the data
     accuracy_train, accuracy_test, precision_weight, recall_weight, f1_weight, ask_once_only = train_and_evaluate(model, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_weight, recall_weight, f1_weight, ask_once_only)
