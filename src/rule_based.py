@@ -13,10 +13,10 @@
 
 import pandas as pd
 import datetime
+
 from preprocess import pre_process
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-from nltk.corpus import wordnet
-from nltk.corpus import sentiwordnet
+from nltk.corpus import wordnet, sentiwordnet
 
 def pre_process_MPQA(filename):
     
@@ -30,50 +30,6 @@ def pre_process_MPQA(filename):
         MPQA[row[1]] = (row[0], int(row[2]))
         
     return MPQA
-
-def actual_sentiment_mpqa(data):
-    
-    # Convert string-format star rating into integer-format
-    for i in data:
-        return int(i[0])
-
-def predict_sentiment_mpqa(data):
-    
-    # Counter for weak subjectivity word
-    weak_frequency = 0
-    
-    # Counter for strong subjectivity word
-    strong_frequency = 0
-    
-    # Compute the sentence's sentiment score by total up the word's polarity score
-    sentence_score = 0
-    for i in data:
-        if i[0] in MPQA:
-            sentence_score = sentence_score + MPQA[i[0]][1]
-            if MPQA[i[0]][0] == 'weaksubj':
-                 weak_frequency += 1
-            elif MPQA[i[0]][0] == 'strongsubj':
-                 strong_frequency += 1
-    
-    # Strong negative
-    if (sentence_score < 0) and (weak_frequency < strong_frequency):
-        return 1
-    
-    # Weak negative
-    elif (sentence_score < 0) and (weak_frequency >= strong_frequency):
-        return 2
-    
-    # Strong positive
-    elif (sentence_score > 0) and (weak_frequency < strong_frequency):
-        return 5
-    
-    # Weak positive
-    elif (sentence_score > 0) and (weak_frequency >= strong_frequency):
-        return 4
-    
-    # Neutral
-    else:
-        return 3
     
 def actual_sentiment_combined(data):
     
@@ -86,7 +42,7 @@ def actual_sentiment_combined(data):
         else:
             return "neutral"
 
-def predict_sentiment_combined(data):
+def predict_sentiment_mpqa(data):
     
     # Compute the sentence's sentiment score by total up the word's polarity score
     sentence_score = 0

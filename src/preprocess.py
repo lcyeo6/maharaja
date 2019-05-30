@@ -13,6 +13,9 @@
 
 import pandas as pd
 import re
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 from nltk import word_tokenize, pos_tag
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords, wordnet
@@ -87,6 +90,6 @@ def pre_process(filename):
 
 
 # Read from Excel & Data cleaning & pre-processing
-#filtered_dataset = pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
-#
+filtered_dataset = pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
+
 #filtered_dataset.to_excel("preprocessed.xlsx")
