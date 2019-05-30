@@ -147,7 +147,7 @@ def identify_token(text):
     # Return it's text back, as requested as a token
     return text
 
-def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only):
+def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_weight, recall_weight, f1_weight, ask_once_only):
     
     # Overfit the training data using ADASYN
     if ask_once_only == False:
@@ -182,20 +182,11 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
     print (confusion_matrix(y_test, y_pred))
     print()
     
-	# Appending all the scores into it's own list for averaging the score at the end
-    precision_micro.append(precision_score(y_test, y_pred,average = 'micro', labels = np.unique(y_pred)))
-    recall_micro.append(recall_score(y_test, y_pred, average = 'micro'))
-    f1_micro.append(f1_score(y_test, y_pred, average = 'micro', labels = np.unique(y_pred)))
-    
-    precision_macro.append(precision_score(y_test, y_pred, average = 'macro', labels = np.unique(y_pred)))
-    recall_macro.append(recall_score(y_test, y_pred, average = 'macro'))
-    f1_macro.append(f1_score(y_test, y_pred, average = 'macro', labels = np.unique(y_pred)))
-    
     precision_weight.append(precision_score(y_test,y_pred,average = 'weighted', labels = np.unique(y_pred)))
     recall_weight.append(recall_score(y_test, y_pred, average = 'weighted'))
     f1_weight.append(f1_score(y_test, y_pred, average = 'weighted', labels = np.unique(y_pred)))
 	
-    return accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only
+    return accuracy_train, accuracy_test, precision_weight, recall_weight, f1_weight, ask_once_only
 
 "-------------------------------------------------------------------------------------------------------------------"
 "-------------------------------------------------------------------------------------------------------------------"
@@ -247,11 +238,11 @@ while True:
 "------------------------------------------------------ TFIDF ------------------------------------------------------"
 # Vectorize review text into unigram, bigram and evaluates into a term document matrix of TF-IDF features
 while True:
-    input_ngram = int(input("Choose either 1: Unigram || 2: Unigram & Bigram:\n"))
+    input_ngram = int(input("Choose either 1: Unigram || 2: Bigram:\n"))
     if input_ngram == 1 or input_ngram == 2:
         break
         
-tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (1, input_ngram), lowercase = False)
+tfidf_vectorizer = TfidfVectorizer(tokenizer = identify_token, ngram_range = (input_ngram, input_ngram), lowercase = False)
 
 t2 = datetime.datetime.now()
 
@@ -268,8 +259,8 @@ print(datetime.datetime.now() - t2)
 
 "----------------------------------------------- SVM / RANDOM FOREST -----------------------------------------------"
 while True:
-    input_model = int(input("Choose 1: Normal SVC || 2: Linear SVC || 3: RBF || 4: Random Forest\n"))
-    if input_model == 1 or input_model == 2 or input_model == 3 or input_model == 4:
+    input_model = int(input("Choose 1: Normal SVC || 2: Linear SVC || 3: Random Forest\n"))
+    if input_model == 1 or input_model == 2 or input_model == 3:
         break
         
 # Normal SVC
@@ -279,10 +270,6 @@ if input_model == 1:
 # LinearSVC
 elif input_model == 2:             
     model = LinearSVC()
-    
-# RBF
-elif input_model == 3:             
-    model = SVC(kernel='rbf')         
     
 # Random Forest Classifier
 else:
@@ -294,14 +281,6 @@ else:
 
 accuracy_train = []
 accuracy_test = []
-
-precision_micro = []
-recall_micro = []
-f1_micro = []
-
-precision_macro = []
-recall_macro = []
-f1_macro = []
 
 precision_weight = []
 recall_weight = []
@@ -323,7 +302,7 @@ for train_index, test_index in kfold.split(vectorized_data, star_rating):
     y_test = [star_rating[i] for i in test_index]
 	
 	# Train and test the data
-    accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only = train_and_evaluate(model, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_micro, recall_micro, f1_micro, precision_macro, recall_macro, f1_macro, precision_weight, recall_weight, f1_weight, ask_once_only)
+    accuracy_train, accuracy_test, precision_weight, recall_weight, f1_weight, ask_once_only = train_and_evaluate(model, X_train, X_test, y_train, y_test, accuracy_train, accuracy_test, precision_weight, recall_weight, f1_weight, ask_once_only)
     
     print("Train and Test Time")
     print(datetime.datetime.now() - t3)
@@ -333,15 +312,15 @@ for train_index, test_index in kfold.split(vectorized_data, star_rating):
 print("accuracy train:   {}".format(np.mean(accuracy_train)))
 print("accuracy test:    {}".format(np.mean(accuracy_test)))
 print()
-print("precision micro:  {}".format(np.mean(precision_micro)))
-print("recall micro:     {}".format(np.mean(recall_micro)))
-print("f1 micro:         {}".format(np.mean(f1_micro)))
-print()
-print("precision macro:  {}".format(np.mean(precision_macro)))
-print("recall macro:     {}".format(np.mean(recall_macro)))
-print("f1 macro:         {}".format(np.mean(f1_macro)))
-print()
+
 print("precision weight: {}".format(np.mean(precision_weight)))
 print("recall weight:    {}".format(np.mean(recall_weight)))
 print("f1 weight:        {}".format(np.mean(f1_weight)))
+print()
 
+print(np.mean(accuracy_train))
+print(np.mean(accuracy_test))
+print()
+print(np.mean(precision_weight))
+print(np.mean(recall_weight))
+print(np.mean(f1_weight))
