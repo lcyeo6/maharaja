@@ -23,6 +23,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import precision_score, recall_score, f1_score, classification_report, confusion_matrix
 from sklearn.model_selection import KFold
 
+from sklearn.metrics import roc_curve, auc
+import pandas as pd
+from scipy import interp
+from itertools import cycle
+import matplotlib.pyplot as plt
+
 def class_equity(a, b):
     
     # Count the frequency of each category
@@ -161,11 +167,56 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
 	# Predicting the training data used on the test data
     y_pred = clf.predict(X_test)
 
-    print ("Classification Report:")
-    print (classification_report(y_test, y_pred))
-    print ("Confusion Matrix:")
-    print (confusion_matrix(y_test, y_pred))
-    print()
+    n_classes = 5
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    
+    for i in range(n_classes):
+        fpr[i], tpr[i], _ = roc_curve(np.array(pd.get_dummies(y_test))[:, i], np.array(pd.get_dummies(y_pred))[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+    
+    
+    all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
+    
+    mean_tpr = np.zeros_like(all_fpr)
+    for i in range(n_classes):
+        mean_tpr += interp(all_fpr, fpr[i], tpr[i])
+    
+    mean_tpr /= n_classes
+    
+    fpr["macro"] = all_fpr
+    tpr["macro"] = mean_tpr
+    roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
+    
+    lw=2
+    plt.figure(figsize=(10,7))
+    plt.plot(fpr["macro"], tpr["macro"],
+             label='macro-average ROC curve (area = {0:0.2f})'
+                   ''.format(roc_auc["macro"]),
+             color='green', linestyle=':', linewidth=4)
+    
+    colors = cycle(['aqua', 'darkorange', 'cornflowerblue'])
+    for i, color in zip(range(n_classes), colors):
+        plt.plot(fpr[i], tpr[i], color=color, lw=lw,
+                 label='ROC curve of class {0} (area = {1:0.2f})'
+                 ''.format(i, roc_auc[i]))
+    
+    plt.plot([0, 1], [0, 1], 'k--',color='red', lw=lw)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.annotate('Random Guess',(.5,.42),color='red')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic for *********************')
+    plt.legend(loc="lower right")
+    plt.show()
+    
+#    print ("Classification Report:")
+#    print (classification_report(y_test, y_pred))
+#    print ("Confusion Matrix:")
+#    print (confusion_matrix(y_test, y_pred))
+#    print()
     
     precision_weight.append(precision_score(y_test,y_pred,average = 'weighted', labels = np.unique(y_pred)))
     recall_weight.append(recall_score(y_test, y_pred, average = 'weighted'))
