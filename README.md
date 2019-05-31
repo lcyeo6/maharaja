@@ -1,7 +1,7 @@
 # MAHARAJA 
 Project is run in Anaconda - Spyder
 
-## User Interface
+## Review text Prediction - User Interface
 ### Files needed
 frontend.py, preprocess_user_input, svm_prediction.py, lexicon_prediction.py
 
@@ -21,8 +21,7 @@ preprocess.py & lexicon.py
 
 #### How to run
 Open and run lexicon.py file, in this file, you will need to choose 
-1. MPQA or 2. SentiWordNet
-Answer only 1 or 2
+MPQA or SentiWordNet **Answer only 1 or 2**
 Once chosen, let the program run and results will be shown in the console.
 
 
@@ -32,16 +31,12 @@ preprocess.py & svm.py
 
 #### How to run
 Open and run svm.py, in this file, you need to choose
-1. Do you want to balance dataset? 
-1.1 Answer only "y" or "n"
+1. Do you want to balance dataset? **Answer only "y" or "n"**
 
-2. Choose either run in: 1. Unigram or 2. Bigram
-2.1 Answer only 1 or 2
+2. Choose either run in: 1. Unigram or 2. Bigram **Answer only 1 or 2**
 
-3. Choose which classifier: 1. SVC(kernel='linear') or 2. LinearSVC() or 3. Random Forest
-3.1 Answer only 1 or 2 or 3 
+3. Choose which classifier: 1. SVC(kernel='linear') or 2. LinearSVC() or 3. Random Forest **Answer only 1 or 2 or 3 **
 
-4. IF YOU ANSWER "n" in Question 1, Do you want to oversample the dataset?
-4.1 Answer only "y" or "n"
+4. IF YOU ANSWER "n" in Question 1, Do you want to oversample the dataset? **Answer only "y" or "n"**
 
 Once all are chosen, let the program run and results will be shown in the console.
