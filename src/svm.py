@@ -155,7 +155,7 @@ def train_and_evaluate(clf, X_train, X_test, y_train, y_test, accuracy_train, ac
         false_ans_0 = True
         if ask_overfit == True:
             while false_ans_0 == True:
-                user_input_0 = input("Do you want to overfit this dataset? (y/n)\n")
+                user_input_0 = input("Do you want to oversample this dataset? (y/n)\n")
                 if user_input_0 == "y":
                     sm = ADASYN()
                     X_train, y_train = sm.fit_sample(X_train, y_train)
