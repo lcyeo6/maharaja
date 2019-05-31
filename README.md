@@ -1,5 +1,6 @@
 # MAHARAJA 
 Project is run in Anaconda - Spyder
+https://github.com/lcyeo6/maharaja
 
 ## Review text Prediction - User Interface
 ### Files needed
