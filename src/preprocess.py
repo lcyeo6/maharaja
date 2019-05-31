@@ -8,14 +8,11 @@
     
     Wan Chee Tin
     Yeo Lin Chung
-    
+
 """
 
 import pandas as pd
 import re
-import seaborn as sns
-import matplotlib.pyplot as plt
-
 from nltk import word_tokenize, pos_tag
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords, wordnet
@@ -36,7 +33,6 @@ def pre_process(filename):
     
     dataset = pd.read_excel(filename, sheet_name = "Sheet1")
     
-    "Note: Specific the columns if new dataset is used"
     # Remove unwanted columns
     dataset = dataset.drop(["uniq_id", "url", "restaurant_id", "restaurant_location", "category", "review_date", "author", "author_url", "location", "visited_on"], axis = 1)
     
@@ -45,6 +41,8 @@ def pre_process(filename):
     
     # Generate a list of stop words such as {'i', 'a', 'the', ...}
     stop_words = set(stopwords.words("english"))
+    # To add additional words into the list, just use the append method as follows.
+    # stopwords.append(<new_word>)
     
     lemmatizer = WordNetLemmatizer()
     
@@ -87,9 +85,3 @@ def pre_process(filename):
     dataset["normalized_review_text"] = dataset.review_text.apply(text_normalization)
     
     return dataset
-
-
-# Read from Excel & Data cleaning & pre-processing
-filtered_dataset = pre_process("tripadvisor_co_uk-travel_restaurant_reviews_sample.xlsx")
-
-#filtered_dataset.to_excel("preprocessed.xlsx")
