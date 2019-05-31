@@ -21,7 +21,9 @@ preprocess.py & lexicon.py
 
 #### How to run
 Open and run lexicon.py file, in this file, you will need to choose 
+
 MPQA or SentiWordNet **Answer only 1 or 2**
+
 Once chosen, let the program run and results will be shown in the console.
 
 
@@ -35,8 +37,11 @@ Open and run svm.py, in this file, you need to choose
 
 2. Choose either run in: 1. Unigram or 2. Bigram **Answer only 1 or 2**
 
-3. Choose which classifier: 1. SVC(kernel='linear') or 2. LinearSVC() or 3. Random Forest **Answer only 1 or 2 or 3 **
+3. Choose which classifier: 1. SVC(kernel='linear') or 2. LinearSVC() or 3. Random Forest **Answer only 1 or 2 or 3**
 
 4. IF YOU ANSWER "n" in Question 1, Do you want to oversample the dataset? **Answer only "y" or "n"**
 
 Once all are chosen, let the program run and results will be shown in the console.
+
+## Unit test files
+unit_test_pre_prrocess & unit_test_lexicon
