@@ -8,8 +8,8 @@ frontend.py, preprocess_user_input, svm_prediction.py, lexicon_prediction.py
 
 ### How to run
 1. Open and run frontend.py
-2. A new window will appear. 
-3. Input review text that you want to predict.
+2. A new window will appear
+3. Input review text that you want to predict
 4. Click on Lexicon to predict sentiment
 5. Click on SVM to predict star rating
 6. Click on Clear to clear input box and results
