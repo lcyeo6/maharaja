@@ -25,7 +25,7 @@ Open and run lexicon.py file, in this file, you will need to choose
 
 MPQA or SentiWordNet **Answer only 1 or 2**
 
-Once chosen, let the program run and results will be shown in the console.
+Once chosen, let the program run and results will be shown in the console
 
 
 ### Machine Learning classifier - SVM & Random Forest
@@ -42,7 +42,7 @@ Open and run svm.py, in this file, you need to choose
 
 4. IF YOU ANSWER "n" in Question 1, Do you want to oversample the dataset? **Answer only "y" or "n"**
 
-Once all are chosen, let the program run and results will be shown in the console.
+Once all are chosen, let the program run and results will be shown in the console
 
 ## Unit test files
 unit_test_pre_prrocess & unit_test_lexicon
