@@ -1,12 +1,12 @@
 # MAHARAJA 
-Project is run in Anaconda - Spyder
+Project is run using Anaconda - Spyder
 https://github.com/lcyeo6/maharaja
 
-## Review text Prediction - User Interface
+## Review Text Prediction - User Interface
 ### Files needed
 frontend.py, preprocess_user_input, svm_prediction.py, lexicon_prediction.py
 
-### How to run
+### How to Run?
 1. Open and run frontend.py
 2. A new window will appear
 3. Input review text that you want to predict
@@ -15,8 +15,8 @@ frontend.py, preprocess_user_input, svm_prediction.py, lexicon_prediction.py
 6. Click on Clear to clear input box and results
 
 
-## Train and test 
-### Rule based model classifier - Lexicon MPQA & SentiWordNet
+## Train and Test 
+### Rule Based Model Classifier - Lexicon MPQA & SentiWordNet
 #### Files needed
 preprocess.py & lexicon.py
 
@@ -32,7 +32,7 @@ Once chosen, let the program run and results will be shown in the console
 #### Files needed
 preprocess.py & svm.py
 
-#### How to run
+#### How to Run?
 Open and run svm.py, in this file, you need to choose
 1. Do you want to balance dataset? **Answer only "y" or "n"**
 
@@ -44,5 +44,5 @@ Open and run svm.py, in this file, you need to choose
 
 Once all are chosen, let the program run and results will be shown in the console
 
-## Unit test files
+## Unit Test Files
 unit_test_pre_prrocess & unit_test_lexicon
